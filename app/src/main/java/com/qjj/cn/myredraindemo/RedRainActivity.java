@@ -98,9 +98,9 @@ public class RedRainActivity extends Activity {
                 intent1.putExtra(RedRainService.REDPACKETRAINID_KEY, redRainPopupView.getRedpacketrainid());
                 startActivity(intent1);*/
 
-                Intent intent = new Intent(RedRainActivity.this, RedRainService.class);
-                intent.putExtra(RedRainService.SHOWTYPE_KEY, RedRainService.TYPE_START_REDRAIN);
-                startService(intent);
+//                Intent intent = new Intent(RedRainActivity.this, RedRainService.class);
+//                intent.putExtra(RedRainService.SHOWTYPE_KEY, RedRainService.TYPE_START_REDRAIN);
+//                startService(intent);
                 dismiss();
             }
         });

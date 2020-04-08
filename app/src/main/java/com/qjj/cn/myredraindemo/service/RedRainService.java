@@ -230,7 +230,7 @@ public class RedRainService extends Service {
 //                    getRedPacketRainInfo();
                     mHandler.post(runnableRain);
                 }
-            }, 3000);
+            }, 100);
         } else if (type == TYPE_START_FLOATING) {
             duration = intent.getIntExtra(DURATION_KEY, 0);
             countdown = intent.getIntExtra(COUNTDOWN_KEY, 0);
@@ -288,12 +288,12 @@ public class RedRainService extends Service {
         rainOpenResponse.getData().setBeginTime("1573091440");
         rainOpenResponse.getData().setServerTime("1573091429");
         rainOpenResponse.getData().setCountdown("10");
-        rainOpenResponse.getData().setForecast("60");
-        rainOpenResponse.getData().setDuration("30");
-        rainOpenResponse.getData().setInterval("120");
+        rainOpenResponse.getData().setForecast("10");
+        rainOpenResponse.getData().setDuration("10");
+        rainOpenResponse.getData().setInterval("10");
         rainOpenResponse.getData().setPercent(80);
         rainOpenResponse.getData().setRedPacketRainId("561651651561");
-        rainOpenResponse.getData().setTimes("4");
+        rainOpenResponse.getData().setTimes("1");
         rainOpenResponse.getData().setTypes("1,2");
         if (rainOpenResponse.getStatus() == 1) {
             RedRainActivityResponse.ResultEntity data = rainOpenResponse.getData();

@@ -5,7 +5,8 @@
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
 
 
@@ -27,18 +28,18 @@
 
         <activity
             android:name=".RedRainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/RedRainstyle"
-            android:launchMode="singleTask"
             android:excludeFromRecents="true"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
+            android:launchMode="singleTask"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/RedRainstyle"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
 
-        <service android:name=".service.RedRainService"
-            android:enabled="true"/>
+        <service
+            android:name=".service.RedRainService"
+            android:enabled="true" />
 
 
     </application>
-
 
 
 </manifest>
