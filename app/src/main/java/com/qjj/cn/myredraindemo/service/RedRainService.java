@@ -49,9 +49,6 @@ public class RedRainService extends Service {
     public static final String REDRAINACTIVITYRESPONSE_KEY = "REDRAINACTIVITYRESPONSE_KEY";
 
     private RedRainActivityResponse.ResultEntity data;
-
-
-    private WindowManager.LayoutParams mLayoutParams;
     private AlarmManager mAlarmManager;
     private Timer mTimer;
     /**
@@ -174,11 +171,6 @@ public class RedRainService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "RedRainService   onCreate   ");
-
-        //设置WindowManger布局参数以及相关属性
-        mLayoutParams = new WindowManager.LayoutParams();
-        Log.i(TAG, "RedRainService   onDestroy --  " );
     }
 
     @Nullable
@@ -221,7 +213,7 @@ public class RedRainService extends Service {
         rainOpenResponse.setStatus(1);
         rainOpenResponse.setData(new RedRainActivityResponse.ResultEntity());
         rainOpenResponse.getData().setBeginTime("1573091439");
-        rainOpenResponse.getData().setServerTime("1573091459");
+        rainOpenResponse.getData().setServerTime("1573091429");
         rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setDuration("10");
         rainOpenResponse.getData().setPercent(80);
@@ -329,7 +321,6 @@ public class RedRainService extends Service {
     }
 
     private void setStartRedRainActivity(int duration, int countdown, String types, int type) {
-        this.redpacketrainid = redpacketrainid;
         this.countdown = countdown;
         this.duration = duration;
         this.types = types;
@@ -342,7 +333,6 @@ public class RedRainService extends Service {
         intent.putExtra(RedRainService.PERCENT_KEY, percent);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-
     }
 
 
