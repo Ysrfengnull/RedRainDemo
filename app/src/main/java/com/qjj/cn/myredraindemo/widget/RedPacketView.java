@@ -111,10 +111,9 @@ public class RedPacketView extends View {
 
                         Log.i("RedPacketView", "onAnimationUpdate  boomIndex " + boomIndex);
 
-                        if (boomIndex < RedPacketRes.BOOM_LIST_BT.length) {
+                        if (boomIndex < RedPacketRes.BOOM_LIST_GOLD.length) {
                             Log.i("RedPacketView", "onAnimationUpdate  " +
                                     "redPacket.getType() " + redPacket.getType());
-
                             redPacket.bitmap = getBitmapFromRes(RedPacketRes.BOOM_LIST_GOLD[boomIndex]);
                         } else {
 //                            如果点击在红包上，重新设置起始位置，以及中奖属性
