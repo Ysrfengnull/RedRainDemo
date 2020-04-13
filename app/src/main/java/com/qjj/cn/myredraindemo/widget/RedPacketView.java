@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
  */
 public class RedPacketView extends View {
 
-    private int[] mImgIds = new int[]{R.mipmap.red_1, R.mipmap.red_2};//红包图片
+    private int[] mImgIds = new int[]{R.mipmap.red_2, R.mipmap.red_2};//红包图片
     private int count;//红包数量
     private int speed;//下落速度
     private float maxSize;//红包大小的范围

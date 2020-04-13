@@ -178,9 +178,9 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         red_rain_view = mainView.findViewById(R.id.red_rain_view);
         iv_clock = mainView.findViewById(R.id.iv_clock);
         redPacketsView = mainView.findViewById(R.id.red_packets_view);
-        redPacketsView.setCount(50);
         tv_countdown = mainView.findViewById(R.id.tv_countdown);
         btn_close.setOnClickListener(this);
+        redPacketsView.setCount(20);
     }
 
     @Override
