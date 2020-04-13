@@ -42,7 +42,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
     private View rl_clock, btn_close;
     private TextView tv_countdown;
-    private FrameLayout ll_root;
     private RelativeLayout red_rain_view;
     private ImageView iv_clock;
     private RedPacketView redPacketsView;
@@ -215,7 +214,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     public void initView(Context context) {
         mContext = context;
         View mainView = LayoutInflater.from(context).inflate(R.layout.popupwindow_red_rain_layout, this, true);
-        ll_root = mainView.findViewById(R.id.ll_root);
         rl_clock = mainView.findViewById(R.id.rl_clock);
         btn_close = mainView.findViewById(R.id.btn_close);
         red_rain_view = mainView.findViewById(R.id.red_rain_view);
@@ -289,19 +287,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         this.session = session;
     }
 
-    public String getTypes() {
-        if (redPacketsView != null) {
-            return redPacketsView.getTypes();
-        }
-        return this.types;
-    }
-
-    public void setTypes(String types) {
-        this.types = types;
-        if (redPacketsView != null) {
-            redPacketsView.setTypes(this.types);
-        }
-    }
 
     /**
      * 开始下红包雨

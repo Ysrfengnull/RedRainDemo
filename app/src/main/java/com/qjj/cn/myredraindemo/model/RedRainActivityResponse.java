@@ -68,7 +68,6 @@ public class RedRainActivityResponse implements Parcelable {
         private String beginTime;   // 开始下雨时间 ，时间戳
         private String countdown;   //  倒计时，单位秒
         private String duration;    // 下雨持续时长，单位秒
-        private String types;    // "2,1"  包含红包大类，1现金，2其他币种
         private int percent;     //中奖率
 
         public String getRedPacketRainId() {
@@ -121,14 +120,6 @@ public class RedRainActivityResponse implements Parcelable {
 
 
 
-        public String getTypes() {
-            return types;
-        }
-
-        public void setTypes(String types) {
-            this.types = types;
-        }
-
         public int getPercent() {
             return percent;
         }
@@ -146,7 +137,6 @@ public class RedRainActivityResponse implements Parcelable {
                     ", beginTime='" + beginTime + '\'' +
                     ", countdown='" + countdown + '\'' +
                     ", duration='" + duration + '\'' +
-                    ", types='" + types + '\'' +
                     ", percent='" + percent + '\'' +
                     '}';
         }
@@ -164,7 +154,6 @@ public class RedRainActivityResponse implements Parcelable {
             dest.writeString(this.beginTime);
             dest.writeString(this.countdown);
             dest.writeString(this.duration);
-            dest.writeString(this.types);
             dest.writeInt(this.percent);
         }
 
@@ -178,7 +167,6 @@ public class RedRainActivityResponse implements Parcelable {
             this.beginTime = in.readString();
             this.countdown = in.readString();
             this.duration = in.readString();
-            this.types = in.readString();
             this.percent = in.readInt();
         }
 

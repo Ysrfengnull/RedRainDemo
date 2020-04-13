@@ -53,11 +53,11 @@ public class RedPacketView extends View {
     private Map<Integer, Bitmap> mBitmapMap = new ConcurrentHashMap<>();
 
     /**
-     * 红包雨 包含红包大类，1现金，2通证
+     * 红包雨 包含红包大类，1卡友节红包，2普通红包
      * 单位 秒
      */
     private String types = "1,2";
-    private List<String> typelist;
+    private List<String> typelist = Arrays.asList(types.split(","));;
 
     public RedPacketView(Context context) {
         super(context);
@@ -353,18 +353,6 @@ public class RedPacketView extends View {
         }
         return bitmap;
     }
-
-    public String getTypes() {
-        return types;
-    }
-
-    public void setTypes(String types) {
-        if (!TextUtils.isEmpty(types)) {
-            this.types = types;
-            this.typelist = Arrays.asList(types.split(","));
-        }
-    }
-
 
     public interface OnRedPacketClickListener {
         void onRedPacketClickListener(RedPacketBean redPacket);

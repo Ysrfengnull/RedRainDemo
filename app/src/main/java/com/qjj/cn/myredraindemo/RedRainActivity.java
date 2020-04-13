@@ -1,6 +1,7 @@
 package com.qjj.cn.myredraindemo;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,12 +24,36 @@ import java.util.Map;
  */
 public class RedRainActivity extends Activity {
     private RedRainPopupView redRainPopupView;
-    private int type = 0;
+
     /**
      * 红包雨ID
      */
     private String redpacketrainid;
 
+    public static void startRedRainActivity(Context context,RedRainActivityResponse.ResultEntity data) {
+        Intent intent = new Intent(context, RedRainActivity.class);
+        intent.putExtra(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+    public static void startBundleRedRainActivity(Context context, RedRainActivityResponse.ResultEntity data ){
+        Intent intent = new Intent(context , RedRainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
+        intent.putExtra("data", bundle);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    public static void setStartRedRainActivity(Context context,String redpacketrainid, int duration, int countdown, int percent) {
+        Intent intent = new Intent(context, RedRainActivity.class);
+        intent.putExtra(RedRainService.DURATION_KEY, duration);
+        intent.putExtra(RedRainService.COUNTDOWN_KEY, countdown);
+        intent.putExtra(RedRainService.REDPACKETRAINID_KEY, redpacketrainid);
+        intent.putExtra(RedRainService.PERCENT_KEY, percent);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,27 +72,10 @@ public class RedRainActivity extends Activity {
             Bundle bundleExtra = intent.getBundleExtra("data");
             if (bundleExtra != null) {
                 RedRainActivityResponse.ResultEntity data = bundleExtra.getParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY);
-                this.type = bundleExtra.getInt("type", 4);
-                Log.i("RedRain", "RedRainActivity initView   intent  type: " + type + "  data:" + data.toString());
+                Log.i("RedRain", "RedRainActivity initView   intent  type: " + "  data:" + data.toString());
                 getDataToUI(data);
             } else {
-                this.type = intent.getIntExtra("type", 0);
-                if (type == 2) {
-                    int duration = intent.getIntExtra(RedRainService.DURATION_KEY, 0);
-                    int countdown = intent.getIntExtra(RedRainService.COUNTDOWN_KEY, 0);
-                    int percent = intent.getIntExtra(RedRainService.PERCENT_KEY, 50);
-                    this.redpacketrainid = intent.getStringExtra(RedRainService.REDPACKETRAINID_KEY);
-                    String types = intent.getStringExtra(RedRainService.TYPES_KEY);
-                    redRainPopupView.setCountDown(countdown);
-                    redRainPopupView.setDuration(duration);
-                    redRainPopupView.setRedpacketrainid(redpacketrainid);
-                    redRainPopupView.setTypes(types);
-                    redRainPopupView.setProbability(percent);
-                } else {
-                    RedRainActivityResponse.ResultEntity data = intent.getParcelableExtra(RedRainService.REDRAINACTIVITYRESPONSE_KEY);
-                    Log.i("RedRain", "RedRainActivity    intent  data: " + data.toString());
-                    getDataToUI(data);
-                }
+                dismiss();
             }
         }
 
@@ -96,19 +104,10 @@ public class RedRainActivity extends Activity {
     private void getDataToUI(RedRainActivityResponse.ResultEntity data) {
         if (data != null) {
             this.redpacketrainid = data.getRedPacketRainId();
-            redRainPopupView.setTypes(data.getTypes());
             redRainPopupView.setRedpacketrainid(data.getRedPacketRainId());
             redRainPopupView.setProbability(data.getPercent());
-            if (type == 0 || type == 4) {
-                redRainPopupView.setCountDown(Integer.parseInt(data.getCountdown()));
-                redRainPopupView.setDuration(Integer.parseInt(data.getDuration()));
-            } else if (type == 1) {
-                Long serverTime = Long.parseLong(data.getServerTime()); //服务器当前时间，时间戳
-                Long beginTime = Long.parseLong(data.getBeginTime());//开始下雨时间 ，时间戳
-                if (serverTime < beginTime) {
-                    long time = beginTime - serverTime;
-                }
-            }
+            redRainPopupView.setCountDown(Integer.parseInt(data.getCountdown()));
+            redRainPopupView.setDuration(Integer.parseInt(data.getDuration()));
         }
     }
 

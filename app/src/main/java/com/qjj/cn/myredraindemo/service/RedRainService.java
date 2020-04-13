@@ -5,21 +5,15 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PixelFormat;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
 
 import com.qjj.cn.myredraindemo.App;
-import com.qjj.cn.myredraindemo.R;
 import com.qjj.cn.myredraindemo.RedRainActivity;
 import com.qjj.cn.myredraindemo.model.RedRainActivityResponse;
 import com.qjj.cn.myredraindemo.util.DateUtils;
@@ -27,8 +21,6 @@ import com.qjj.cn.myredraindemo.util.DateUtils;
 import java.text.ParseException;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import androidx.annotation.Nullable;
 
 /**
  * created by QinJiaJun
@@ -43,7 +35,6 @@ public class RedRainService extends Service {
     public static final int TYPE_START_REDRAIN = 100;
     public static final String DURATION_KEY = "DURATION_KEY";
     public static final String COUNTDOWN_KEY = "COUNTDOWN_KEY";
-    public static final String TYPES_KEY = "TYPES_KEY";
     public static final String REDPACKETRAINID_KEY = "redPacketRainId";
     public static final String PERCENT_KEY = "PERCENT_KEY";
     public static final String REDRAINACTIVITYRESPONSE_KEY = "REDRAINACTIVITYRESPONSE_KEY";
@@ -60,7 +51,7 @@ public class RedRainService extends Service {
      * 红包雨持续的时间
      * 15 秒
      */
-    private int duration = 60;
+    private int duration = 10;
     /**
      * 红包雨 倒计时
      * 单位 秒
@@ -150,18 +141,13 @@ public class RedRainService extends Service {
         @Override
         public void run() {
             if (App.getAppContext().isActivity()) {
-                Intent intent = new Intent(RedRainService.this, RedRainActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
-                bundle.putInt("type", 4);
-                intent.putExtra("data", bundle);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+                RedRainActivity.startBundleRedRainActivity(RedRainService.this,data);
                 Log.i(TAG, "RedRainService    runnableStartRain  runnableStartRain ");
                 mHandler.removeCallbacks(runnableRain);
             } else {
                 Log.i(TAG, "RedRainService    runnableStartRain  postDelayed  1000");
-                mHandler.postDelayed(runnableRain, 1000);
+                //后台就不开启了
+//                mHandler.postDelayed(runnableRain, 1000);
             }
 
         }
@@ -212,13 +198,12 @@ public class RedRainService extends Service {
         rainOpenResponse.setCode(1);
         rainOpenResponse.setStatus(1);
         rainOpenResponse.setData(new RedRainActivityResponse.ResultEntity());
-        rainOpenResponse.getData().setBeginTime("1573091439");
+        rainOpenResponse.getData().setBeginTime("1573091430");
         rainOpenResponse.getData().setServerTime("1573091429");
         rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setDuration("10");
         rainOpenResponse.getData().setPercent(80);
         rainOpenResponse.getData().setRedPacketRainId("561651651561");
-        rainOpenResponse.getData().setTypes("1,2");
         if (rainOpenResponse.getStatus() == 1) {
             RedRainActivityResponse.ResultEntity data = rainOpenResponse.getData();
             redpacketrainid = data.getRedPacketRainId();
@@ -268,7 +253,8 @@ public class RedRainService extends Service {
             } else if (serverTime.longValue() == beginTime.longValue()) {
                 App.getAppContext().setRedRain(true);
                 Log.i(TAG, "RedRainService  serverTime == startTime   setStartRedRainActivity ");
-                setStartRedRainActivity(duration, 0, data.getTypes(), 2);
+                this.duration = duration;
+                RedRainActivity.setStartRedRainActivity(RedRainService.this,redpacketrainid,duration, 0,  percent);
                 return;
             } else {
                 Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动时间已超出  活动结束了");
@@ -306,36 +292,11 @@ public class RedRainService extends Service {
             mHandler.postDelayed(runnableStartRain, anHour);
         } else if (serverTime.longValue() == startTime.longValue()) {
             Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + "正好3秒");
-            startRedRainActivity(data, 0);
+            RedRainActivity.startRedRainActivity(RedRainService.this,data);
         } else {
             Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨 活动时间结束了");
         }
     }
-
-    private void startRedRainActivity(RedRainActivityResponse.ResultEntity data, int type) {
-        Intent i = new Intent(this, RedRainActivity.class);
-        i.putExtra(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
-        i.putExtra("type", type);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(i);
-    }
-
-    private void setStartRedRainActivity(int duration, int countdown, String types, int type) {
-        this.countdown = countdown;
-        this.duration = duration;
-        this.types = types;
-        Intent intent = new Intent(RedRainService.this, RedRainActivity.class);
-        intent.putExtra("type", type);
-        intent.putExtra(RedRainService.DURATION_KEY, duration);
-        intent.putExtra(RedRainService.COUNTDOWN_KEY, countdown);
-        intent.putExtra(RedRainService.TYPES_KEY, types);
-        intent.putExtra(RedRainService.REDPACKETRAINID_KEY, redpacketrainid);
-        intent.putExtra(RedRainService.PERCENT_KEY, percent);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
