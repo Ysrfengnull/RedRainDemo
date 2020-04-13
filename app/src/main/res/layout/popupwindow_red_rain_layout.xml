@@ -48,8 +48,8 @@
                 android:id="@+id/red_packets_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:max_size="0.8"
-                app:min_size="0.6"
+                app:max_size="1.0"
+                app:min_size="0.8"
                 app:speed="150" />
 
             <TextView

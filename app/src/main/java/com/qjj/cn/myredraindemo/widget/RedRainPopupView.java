@@ -399,36 +399,10 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         GetRedPacketRainOpenResponse rainOpenResponse = new GetRedPacketRainOpenResponse();
         rainOpenResponse.setCode(1);
         rainOpenResponse.setStatus(1);
-        rainOpenResponse.setMsg("获得红包");
         rainOpenResponse.setData(new GetRedPacketRainOpenResponse.ResultEntity());
-        int num = (int) (Math.random() * 5 + 1);
-        switch (num) {
-            case 1:
-                rainOpenResponse.getData().setSymbol("AAA");
-                rainOpenResponse.getData().setContract("AAA");
-                rainOpenResponse.getData().setMoney("0.1235");
-                break;
-            case 2:
-                rainOpenResponse.getData().setSymbol("BBB");
-                rainOpenResponse.getData().setContract("BBB");
-                rainOpenResponse.getData().setMoney("0.2012");
-                break;
-            case 3:
-                rainOpenResponse.getData().setSymbol("CCC");
-                rainOpenResponse.getData().setContract("CCC");
-                rainOpenResponse.getData().setMoney("0.1013");
-                break;
-            case 4:
-                rainOpenResponse.getData().setSymbol("DDD");
-                rainOpenResponse.getData().setContract("DDD");
-                rainOpenResponse.getData().setMoney("0.1132");
-                break;
-            case 5:
-                rainOpenResponse.getData().setSymbol("EEE");
-                rainOpenResponse.getData().setContract("EEE");
-                rainOpenResponse.getData().setMoney("0.1354");
-                break;
-        }
+        rainOpenResponse.getData().setSymbol("获得红包");
+        rainOpenResponse.getData().setContract("");
+        rainOpenResponse.getData().setMoney("1");
 
         if (rainOpenResponse.getStatus() == 1) {
             GetRedPacketRainOpenResponse.ResultEntity data = rainOpenResponse.getData();
