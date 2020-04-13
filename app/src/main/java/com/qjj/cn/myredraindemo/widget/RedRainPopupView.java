@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import com.qjj.cn.myredraindemo.R;
 import com.qjj.cn.myredraindemo.model.GetRedPacketRainOpenResponse;
 import com.qjj.cn.myredraindemo.model.RedPacketBean;
-import com.qjj.cn.myredraindemo.util.SoundPoolUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -200,7 +199,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
             mHandler.sendEmptyMessage(100);
         }
     };
-    private SoundPoolUtil mSoundPoolUtil;
+
 
 
     public RedRainPopupView(@NonNull Context context) {
@@ -331,10 +330,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         redPacketsView.setOnRedPacketClickListener(new RedPacketView.OnRedPacketClickListener() {
             @Override
             public void onRedPacketClickListener(RedPacketBean redPacket) {
-                if (mSoundPoolUtil == null) {
-                    mSoundPoolUtil = SoundPoolUtil.getInstance(mContext);
-                }
-                mSoundPoolUtil.play(2);
                 //请求服务器 调用开红包接口
                 boolean isWinning = redPacket.isRealRedPacket(probability);
                 if (isWinning) {
