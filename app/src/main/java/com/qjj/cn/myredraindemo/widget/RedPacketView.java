@@ -102,7 +102,7 @@ public class RedPacketView extends View {
                     RedPacketBean redPacket = redpacketlist.get(i);
                     //更新红包的下落的位置y
                     redPacket.y += (redPacket.speed * secs);
-                    if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT || redPacket.getType() == RedPacketBean.TYPE_BOOM_GOLD) {
+                    if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT) {
                         Log.i("RedPacketView", "onAnimationUpdate  redPacket.y: " + redPacket.y + "   (redPacket.speed * secs): " + (redPacket.speed * secs));
                         final int typeIndex = redPacket.addTypeIndex(1) - 1;
                         Log.i("RedPacketView", "onAnimationUpdate  typeIndex " + typeIndex);
@@ -115,13 +115,7 @@ public class RedPacketView extends View {
                             Log.i("RedPacketView", "onAnimationUpdate  " +
                                     "redPacket.getType() " + redPacket.getType());
 
-                            if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT || redPacket.getType() == RedPacketBean.TYPE_PACKET_BT) {
-                                redPacket.bitmap = getBitmapFromRes(RedPacketRes.BOOM_LIST_BT[boomIndex]);
-                            } else {
-                                Log.i("RedPacketView", "onAnimationUpdate  " +
-                                        "redPacket.getType() " + redPacket.getType());
-                                redPacket.bitmap = getBitmapFromRes(RedPacketRes.BOOM_LIST_GOLD[boomIndex]);
-                            }
+                            redPacket.bitmap = getBitmapFromRes(RedPacketRes.BOOM_LIST_GOLD[boomIndex]);
                         } else {
 //                            如果点击在红包上，重新设置起始位置，以及中奖属性
                             redPacket.setTypeIndex(0);
@@ -134,11 +128,7 @@ public class RedPacketView extends View {
                             } else if (typelist.size() == 1) {
                                 num = Integer.parseInt(typelist.get(0)) - 1;
                             }
-                            if (redPacket.getType() == RedPacketBean.TYPE_PACKET_GOLD || redPacket.getType() == RedPacketBean.TYPE_BOOM_GOLD) {
-                                redPacket.setType(RedPacketBean.TYPE_PACKET_GOLD);
-                            } else {
-                                redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
-                            }
+                            redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
                             Bitmap originalBitmap = getBitmapFromRes(mImgIds[num]);
                             redPacket.bitmap = originalBitmap;
                         }
@@ -154,11 +144,7 @@ public class RedPacketView extends View {
                             num = Integer.parseInt(typelist.get(0)) - 1;
                         }
                         Bitmap originalBitmap = getBitmapFromRes(mImgIds[num]);
-                        if (num == 0) {
-                            redPacket.setType(RedPacketBean.TYPE_PACKET_GOLD);
-                        } else {
-                            redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
-                        }
+                        redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
                         redPacket.bitmap = originalBitmap;
                     }
                     //更新红包的旋转的角度
@@ -213,12 +199,7 @@ public class RedPacketView extends View {
                 RedPacketBean redPacket = isRedPacketClick(motionEvent.getX(), motionEvent.getY());
                 if (redPacket != null) {
                     //如果点击在红包上，重新设置起始位置，以及中奖属性
-//                    redPacket.y = 0 - redPacket.height;
-                    if (redPacket.getType() == RedPacketBean.TYPE_PACKET_BT || redPacket.getType() == RedPacketBean.TYPE_BOOM_BT) {
-                        redPacket.setType(RedPacketBean.TYPE_BOOM_BT);
-                    } else {
-                        redPacket.setType(RedPacketBean.TYPE_BOOM_GOLD);
-                    }
+                    redPacket.setType(RedPacketBean.TYPE_BOOM_BT);
                     if (onRedPacketClickListener != null) {
                         onRedPacketClickListener.onRedPacketClickListener(redPacket);
                     }
@@ -295,11 +276,7 @@ public class RedPacketView extends View {
             Bitmap originalBitmap = getBitmapFromRes(mImgIds[num]);
             //生成红包实体类
             RedPacketBean redPacket = new RedPacketBean(getContext(), originalBitmap, speed, maxSize, minSize, mWidth);
-            if (num == 0) {
-                redPacket.setType(RedPacketBean.TYPE_PACKET_GOLD);
-            } else {
-                redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
-            }
+            redPacket.setType(RedPacketBean.TYPE_PACKET_BT);
             //添加进入红包数组
             redpacketlist.add(redPacket);
         }

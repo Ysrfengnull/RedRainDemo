@@ -14,11 +14,8 @@ import java.util.Random;
  * Describe: 红包实体类
  */
 public class RedPacketBean implements Parcelable {
-    public static final int TYPE_PACKET_BT = 1; // 区块链币
-    public static final int TYPE_PACKET_GOLD = 2; // 金币
-
+    public static final int TYPE_PACKET_BT = 1;
     public static final int TYPE_BOOM_BT = 5; //爆炸
-    public static final int TYPE_BOOM_GOLD = 6; //爆炸
 
     public float x, y;
     public float rotation;
@@ -101,7 +98,7 @@ public class RedPacketBean implements Parcelable {
     }
 
     public boolean isClickable() {
-        return mType == TYPE_PACKET_BT || mType == TYPE_PACKET_GOLD;
+        return mType == TYPE_PACKET_BT ;
     }
 
     public int getType() {

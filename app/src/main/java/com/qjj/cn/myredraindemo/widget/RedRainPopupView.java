@@ -6,12 +6,8 @@ import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -53,11 +49,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     private OnProgressListener mOnProgressListener;
 
     /**
-     * 红包雨 包含红包大类，1现金，2通证
-     * 单位 秒
-     */
-    private String types = "1,2";
-    /**
      * 红包雨 倒计时
      * 单位 秒
      */
@@ -73,13 +64,11 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      * 60 秒
      */
     private int duration = 60;
-    /**
-     * 场次  第几场红包雨
-     * 5
-     */
-    private int session = 1;
 
-    private int totalmoney = 0;
+    /**
+     * 有效红包总个数
+     */
+    private int totalCount = 0;
 
     /**
      * 中奖率
@@ -249,14 +238,13 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         return this.duration;
     }
 
-    public int getSession() {
-        return session;
+    public int getTotalCount() {
+        return totalCount;
     }
 
-    public void setSession(int session) {
-        this.session = session;
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
     }
-
 
     /**
      * 开始下红包雨
@@ -288,9 +276,16 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
                 //请求服务器 调用开红包接口
                 boolean isWinning = redPacket.isRealRedPacket(probability);
                 if (isWinning) {
-                    redPacketRainOpen(redPacket);
+                    if (totalCount == 4) {
+                        redPacket.setType(RedPacketBean.TYPE_BOOM_BT);
+                        setWinning(redPacket);
+                    } else {
+                        redPacketRainOpen(redPacket);
+                        totalCount += 1;
+                    }
                 } else {
-                    setWinning(redPacket, false);
+                    redPacket.setType(RedPacketBean.TYPE_BOOM_BT);
+                    setWinning(redPacket);
                 }
             }
         });
@@ -300,7 +295,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      * 停止下红包雨
      */
     public void stopRedRain() {
-        totalmoney = 0;//金额清零
+        totalCount = 0;//金额清零
         startRedRainTask.cancel();
         stopTask.cancel();
         timer.cancel();
@@ -331,15 +326,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     }
 
 
-    private void setTotalMoneys(String contract, String moneyType, double money, int redPackeType) {
-        synchronized (this) {
-            Log.i("TotalMoneys", " 累加金币  " + contract + " , " + moneyType + " , " + money);
-            totalmoneysList.put(contract, money);
- //更新个数
-        }
-
-    }
-
     public int getProbability() {
         return probability;
     }
@@ -354,37 +340,27 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      * @param redPacket
      */
     private void redPacketRainOpen(final RedPacketBean redPacket) {
-        session += 1;
-        if (true) {
-            RedPacketBean redPacketBean = new RedPacketBean();
-            redPacketBean.setSymbol("1");
-            redPacketBean.setType(redPacket.getType());
-            redPacketBean.x = redPacket.x;
-            redPacketBean.y = redPacket.y;
-            setWinning(redPacketBean, true);
-            Log.i("RedRainMoney", " Post  " + redPacketBean.getSymbol()+" Winning= true" );
-        } else {
-            RedPacketBean redPacketBean = new RedPacketBean();
-            redPacketBean.setType(redPacket.getType());
-            redPacketBean.x = redPacket.x;
-            redPacketBean.y = redPacket.y;
-            setWinning(redPacketBean, false);
-            Log.i("RedRainMoney", " Post  "  + redPacketBean.getSymbol()+" Winning= false" );
-        }
+
+        RedPacketBean redPacketBean = new RedPacketBean();
+        redPacketBean.setSymbol("1");
+        redPacketBean.setType(redPacket.getType());
+        redPacketBean.x = redPacket.x;
+        redPacketBean.y = redPacket.y;
+        setWinning(redPacketBean);
+
+        Log.i("RedRainMoney", " Post  " + redPacketBean.getSymbol()+" Winning= true"+" totalCount= "+totalCount );
     }
 
     /**
      * 设置中奖
      */
-    private synchronized void setWinning(final RedPacketBean redPacket, final boolean isWinning) {
+    private synchronized void setWinning(final RedPacketBean redPacket) {
         String text = "";
         final TextView tv = new TextView(redPacketsView.getContext());
-        if (isWinning) {
-            if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT) {
-                text = "";
-            } else {
-                text = "+" + redPacket.getSymbol();
-            }
+        if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT) {
+            text = "";
+        } else {
+            text = "+" + redPacket.getSymbol();
         }
         tv.setText(text);
         tv.setTextColor(Color.parseColor("#FFBD00"));

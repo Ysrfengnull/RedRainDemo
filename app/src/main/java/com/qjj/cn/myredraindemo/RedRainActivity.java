@@ -82,13 +82,13 @@ public class RedRainActivity extends Activity {
         redRainPopupView.setOnProgressListener(new RedRainPopupView.OnProgressListener() {
             @Override
             public void onStopRedRain(int number) {
-                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getSession(): " + redRainPopupView.getSession() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
+                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getTotalCount(): " + redRainPopupView.getTotalCount() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
                 dismiss();
             }
 
             @Override
             public void onEnd(boolean isAdd) {
-                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getSession(): " + redRainPopupView.getSession() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
+                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getTotalCount(): " + redRainPopupView.getTotalCount() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
                 //红包雨结算界面  由于一些原因 暂时不公开
                 dismiss();
             }
