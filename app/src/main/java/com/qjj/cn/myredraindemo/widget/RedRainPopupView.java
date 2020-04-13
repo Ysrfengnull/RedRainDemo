@@ -24,7 +24,6 @@ import com.qjj.cn.myredraindemo.R;
 import com.qjj.cn.myredraindemo.model.RedPacketBean;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;

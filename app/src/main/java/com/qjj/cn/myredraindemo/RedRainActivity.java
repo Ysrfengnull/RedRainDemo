@@ -12,9 +12,6 @@ import com.qjj.cn.myredraindemo.service.RedRainService;
 import com.qjj.cn.myredraindemo.util.StatusBarUtil;
 import com.qjj.cn.myredraindemo.widget.RedRainPopupView;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * created by QinJiaJun
@@ -61,7 +58,6 @@ public class RedRainActivity extends Activity {
         StatusBarUtil.setStatusBar(this, true, true, R.color.transparent);
         setContentView(R.layout.activity_red_rain);
         initView();
-        initData();
     }
 
 
@@ -98,10 +94,6 @@ public class RedRainActivity extends Activity {
         Log.i("RedRain", "StartRedRain  RedRainActivity    intent   redpacketrainid: " + redpacketrainid);
     }
 
-    private void initData() {
-        getRedPacketData();
-    }
-
     private void getDataToUI(RedRainActivityResponse.ResultEntity data) {
         if (data != null) {
             this.redpacketrainid = data.getRedPacketRainId();
@@ -111,18 +103,6 @@ public class RedRainActivity extends Activity {
             redRainPopupView.setDuration(Integer.parseInt(data.getDuration()));
         }
     }
-
-    /**
-     * 获取当前场次红包雨 获得的具体金额数
-     * 如果在红包雨下落期间（活动期间） 用户手动关闭当前界面
-     * 再次打开后 应当再次显示关闭前同场红包雨获得金额数 以及展示列表
-     */
-    private void getRedPacketData() {
-        Map<String, String> stringMap = new HashMap<>();
-        stringMap.put("redPacketRainId", redpacketrainid);
-        //请求服务器
-    }
-
 
 
     @Override
