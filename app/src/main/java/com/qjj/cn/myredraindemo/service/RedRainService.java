@@ -220,8 +220,8 @@ public class RedRainService extends Service {
         rainOpenResponse.setCode(1);
         rainOpenResponse.setStatus(1);
         rainOpenResponse.setData(new RedRainActivityResponse.ResultEntity());
-        rainOpenResponse.getData().setBeginTime("1573091440");
-        rainOpenResponse.getData().setServerTime("1573091429");
+        rainOpenResponse.getData().setBeginTime("1573091439");
+        rainOpenResponse.getData().setServerTime("1573091459");
         rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setDuration("10");
         rainOpenResponse.getData().setPercent(80);
@@ -254,42 +254,26 @@ public class RedRainService extends Service {
             }
             //下雨持续时长，单位秒
             int duration = Integer.parseInt(data.getDuration());
-            //开始倒计时时间 ，时间戳
-            int countdown = Integer.parseInt(data.getCountdown());
             //服务器当前时间，时间戳
             Long serverTime = Long.parseLong(data.getServerTime());
-            //开始下雨时间 ，时间戳
+            //每场开始时间 开始下雨时间 ，时间戳
             Long beginTime = Long.parseLong(data.getBeginTime());
-            //每场开始时间
-            Long startTime = (beginTime );
-            try {
-                Log.i(TAG, "RedRainService   startRedPacketRainAlarm  " +
-                        "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                        "   beginTime: " + data.getBeginTime() + "  " + DateUtils.longToString(beginTime * 1000L, "yyyy-MM-dd HH:mm:ss")
-
-                );
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            //每场开始倒计时任务时间
-
             //每次红包结束时间
-            Long endTime = startTime + duration;
+            Long endTime = beginTime + duration;
             try {
                 Log.i(TAG, "StartRedRain  RedRainService   startRedPacketRainAlarm "+
                         "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                        "   startTime: " + startTime + "  " + DateUtils.longToString(startTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
                         "   endTime: " + endTime + "  " + DateUtils.longToString(endTime * 1000L, "yyyy-MM-dd HH:mm:ss"));
+                Log.i(TAG,"serverTime == beginTime?"+(serverTime == beginTime ));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-            if (serverTime < startTime) {
+            if (serverTime < beginTime) {
                 Log.i(TAG, "RedRainService  serverTime < startTime   getStartTimeToTask ");
                 App.getAppContext().setRedRain(true);
-                getStartTimeToTask(serverTime, startTime, data);
+                getStartTimeToTask(serverTime, beginTime, data);
                 return;
-            } else if (serverTime == startTime) {
+            } else if (serverTime.longValue() == beginTime.longValue()) {
                 App.getAppContext().setRedRain(true);
                 Log.i(TAG, "RedRainService  serverTime == startTime   setStartRedRainActivity ");
                 setStartRedRainActivity(duration, 0, data.getTypes(), 2);
@@ -314,47 +298,29 @@ public class RedRainService extends Service {
         Log.i(TAG, "RedRainService   getStartTimeToTask  RedRainActivityResponse data: " + data.toString());
         this.data = data;
         this.percent = data.getPercent();
+        this.redpacketrainid = data.getRedPacketRainId();
         try {
             Log.i(TAG, "RedRainService   getStartTimeToTask  serverTime: " + serverTime
                     + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") + "   beginTime: " + startTime + "  " + DateUtils.longToString(startTime * 1000L, "yyyy-MM-dd HH:mm:ss"));
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        //下雨持续时长，单位秒
-        int duration = Integer.parseInt(data.getDuration());
-        //开始倒计时时间 ，时间戳
-        int countdown = Integer.parseInt(data.getCountdown());
 
-        if (serverTime <= startTime) {
-            long countdownTime = startTime - countdown;
+        if (serverTime < startTime) {
             // 小于倒计时时间 开始计时任务
-            if (serverTime < countdownTime) {
-                long anHour = ((countdownTime - serverTime)) * 1000L; // 这是毫秒数
-                Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + anHour + "毫秒");
-
-                //方法二
-                mHandler.postDelayed(runnableStartRain, anHour);
-
-            } else if (serverTime == countdownTime) {
-                Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + "正好10秒");
-                startRedRainActivity(data, 0, 1);
-            } else {
-                if (serverTime < startTime) {
-                    setStartRedRainActivity(duration, (int) (startTime - serverTime), data.getTypes(), 2);
-                    Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时秒： " + (int) (startTime - serverTime));
-                } else {
-                    Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 进行中 ");
-                    setStartRedRainActivity((int) ((startTime + duration) - serverTime), 0, data.getTypes(), 2);
-                }
-            }
-            this.redpacketrainid = data.getRedPacketRainId();
+            long anHour = ((startTime - serverTime)) * 1000L; // 这是毫秒数
+            Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + anHour + "毫秒");
+            //方法二
+            mHandler.postDelayed(runnableStartRain, anHour);
+        } else if (serverTime.longValue() == startTime.longValue()) {
+            Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + "正好3秒");
+            startRedRainActivity(data, 0);
         } else {
             Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨 活动时间结束了");
         }
-
     }
 
-    private void startRedRainActivity(RedRainActivityResponse.ResultEntity data, int type, int session) {
+    private void startRedRainActivity(RedRainActivityResponse.ResultEntity data, int type) {
         Intent i = new Intent(this, RedRainActivity.class);
         i.putExtra(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
         i.putExtra("type", type);
