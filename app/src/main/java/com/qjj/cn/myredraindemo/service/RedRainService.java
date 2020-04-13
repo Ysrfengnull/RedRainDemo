@@ -41,9 +41,6 @@ public class RedRainService extends Service {
     private static final String TAG = "RedRain";
     public static final String SHOWTYPE_KEY = "SHOWTYPE_KEY";
     public static final int TYPE_START_REDRAIN = 100;
-    public static final int TYPE_START_FLOATING = 102;
-    public static final int TYPE_VISIBLE_FLOATING = 103;
-    public static final int TYPE_GONE_FLOATING = 104;
     public static final int TYPE_LANGUAGE = 105;
 
     public static final String DURATION_KEY = "DURATION_KEY";
@@ -54,8 +51,8 @@ public class RedRainService extends Service {
     public static final String REDRAINACTIVITYRESPONSE_KEY = "REDRAINACTIVITYRESPONSE_KEY";
 
     private RedRainActivityResponse.ResultEntity data;
-    private WindowManager mWindowManager;
-    private View mFloatingView;
+
+
     private WindowManager.LayoutParams mLayoutParams;
     private AlarmManager mAlarmManager;
     private Timer mTimer;
@@ -99,12 +96,7 @@ public class RedRainService extends Service {
                         countdown--;
                     } else {
                         if (0 == duration) {
-                            if (mFloatingView != null) {
-                                mHandler.post(runnablePop);
-                            }
                             cancelTimeAccount();
-                            App.isFloating = false;
-                            removeFloatingView();
                             mHandler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -185,10 +177,10 @@ public class RedRainService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "RedRainService   onCreate   ");
-        mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+
         //设置WindowManger布局参数以及相关属性
         mLayoutParams = new WindowManager.LayoutParams();
-        Log.i(TAG, "RedRainService   onDestroy --    App.isFloating: " + App.isFloating);
+        Log.i(TAG, "RedRainService   onDestroy --  " );
     }
 
     @Nullable
@@ -208,10 +200,6 @@ public class RedRainService extends Service {
 
         Log.i(TAG, "RedRainService    onStartCommand  type: " + type);
         if (type == TYPE_START_REDRAIN) {
-            if (App.isFloating) {
-                mHandler.post(runnableRain);
-                return super.onStartCommand(intent, flags, startId);
-            }
             cancelTimeAccount();
             mHandler.postDelayed(new Runnable() {
                 @Override
@@ -220,45 +208,15 @@ public class RedRainService extends Service {
                     mHandler.post(runnableRain);
                 }
             }, 100);
-        } else if (type == TYPE_START_FLOATING) {
-            duration = intent.getIntExtra(DURATION_KEY, 0);
-            countdown = intent.getIntExtra(COUNTDOWN_KEY, 0);
-            types = intent.getStringExtra(TYPES_KEY);
-            redpacketrainid = intent.getStringExtra(REDPACKETRAINID_KEY);
-            if (mTimer == null) {
-                mTimer = new Timer();
-            }
-            countDownTask = new TimerTask() {
+        }else if (type == TYPE_LANGUAGE) {
+            Log.i(TAG, "RedRainService   onStartCommand  TYPE_LANGUAGE  mFloatingView INVISIBLE ");
+            mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mHandler.sendEmptyMessage(200);
+                    showFloatingWindow();
+                    mHandler.post(runnableRain);
                 }
-            };
-
-            mTimer.schedule(countDownTask, 0, 1000);
-            showFloatingWindow();
-        } else if (type == TYPE_GONE_FLOATING) {
-            if (App.isFloating) {
-                invisibleFloatingView();
-            }
-
-        } else if (type == TYPE_VISIBLE_FLOATING) {
-            if (App.isFloating) {
-                visibleFloatingView();
-            }
-        } else if (type == TYPE_LANGUAGE) {
-            if (mFloatingView != null && mFloatingView.getVisibility() == View.VISIBLE) {
-                Log.i(TAG, "RedRainService   onStartCommand  TYPE_LANGUAGE  mFloatingView VISIBLE ");
-            } else {
-                Log.i(TAG, "RedRainService   onStartCommand  TYPE_LANGUAGE  mFloatingView INVISIBLE ");
-                mHandler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        showFloatingWindow();
-                        mHandler.post(runnableRain);
-                    }
-                }, 1000);
-            }
+            }, 1000);
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -347,10 +305,6 @@ public class RedRainService extends Service {
             } else if (serverTime == startTime) {
                 App.getAppContext().setRedRain(true);
                 Log.i(TAG, "RedRainService  serverTime == startTime   setStartRedRainActivity ");
-                if (App.isFloating) {
-                    setVisibleFloatingTask(0, duration, data.getRedPacketRainId(), data.getTypes());
-                    return;
-                }
                 setStartRedRainActivity(duration, 0, data.getTypes(), 2);
                 return;
             } else {
@@ -377,38 +331,6 @@ public class RedRainService extends Service {
         //初始化位置
         mLayoutParams.x = 10;
         mLayoutParams.y = 100;
-
-        mFloatingView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.layout_floating_view, null);
-        //红包雨悬浮按钮
-        ImageView screenBtn = (ImageView) mFloatingView.findViewById(R.id.ic_bed_rain);
-        screenBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RedRainService.this, RedRainActivity.class);
-                intent.putExtra("type", 2);
-                intent.putExtra(RedRainService.DURATION_KEY, duration);
-                intent.putExtra(RedRainService.COUNTDOWN_KEY, countdown);
-                intent.putExtra(RedRainService.TYPES_KEY, types);
-                intent.putExtra(RedRainService.REDPACKETRAINID_KEY, redpacketrainid);
-                intent.putExtra(RedRainService.PERCENT_KEY, percent);
-
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                removeFloatingView();
-                duration = 60;
-                if (countDownTask != null) {
-                    countDownTask.cancel();
-                }
-                App.isFloating = false;
-            }
-        });
-        mFloatingView.setOnTouchListener(new FloatingOnTouchListener());
-        if (mWindowManager == null) {
-            mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-            mLayoutParams = new WindowManager.LayoutParams();
-        }
-        App.isFloating = true;
-        mWindowManager.addView(mFloatingView, mLayoutParams);
     }
 
 
@@ -437,7 +359,6 @@ public class RedRainService extends Service {
                     mTouchCurrentY = (int) event.getRawY();
                     mLayoutParams.x += mTouchCurrentX - mTouchStartX;
                     mLayoutParams.y += mTouchCurrentY - mTouchStartY;
-                    mWindowManager.updateViewLayout(mFloatingView, mLayoutParams);
                     mTouchStartX = mTouchCurrentX;
                     mTouchStartY = mTouchCurrentY;
                     break;
@@ -525,28 +446,16 @@ public class RedRainService extends Service {
 
                 //方法二
                 mHandler.postDelayed(runnableStartRain, anHour);
-                removeFloatingView();
+
             } else if (serverTime == countdownTime) {
                 Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + "正好10秒");
-                if (App.isFloating) {
-                    setVisibleFloatingTask(countdown, duration, data.getRedPacketRainId(), data.getTypes());
-                    return;
-                }
                 startRedRainActivity(data, 0, 1);
             } else {
                 if (serverTime < startTime) {
-                    if (App.isFloating) {
-                        setVisibleFloatingTask((int) (startTime - serverTime), duration, data.getRedPacketRainId(), data.getTypes());
-                        return;
-                    }
                     setStartRedRainActivity(duration, (int) (startTime - serverTime), data.getTypes(), 2);
                     Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时秒： " + (int) (startTime - serverTime));
                 } else {
                     Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 进行中 ");
-                    if (App.isFloating) {
-                        setVisibleFloatingTask(0, (int) ((startTime + duration) - serverTime), data.getRedPacketRainId(), data.getTypes());
-                        return;
-                    }
                     setStartRedRainActivity((int) ((startTime + duration) - serverTime), 0, data.getTypes(), 2);
                 }
             }
@@ -579,40 +488,9 @@ public class RedRainService extends Service {
         intent.putExtra(RedRainService.PERCENT_KEY, percent);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        removeFloatingView();
-        App.isFloating = false;
+
     }
 
-    /**
-     * 移除FloatingView
-     */
-    private void removeFloatingView() {
-        if (mFloatingView != null) {
-            if (mWindowManager == null) {
-                mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-            }
-            mWindowManager.removeViewImmediate(mFloatingView);
-            mFloatingView = null;
-        }
-    }
-
-    /**
-     * 显示FloatingView
-     */
-    private void visibleFloatingView() {
-        if (mFloatingView != null) {
-            mFloatingView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    /**
-     * 隐藏FloatingView
-     */
-    private void invisibleFloatingView() {
-        if (mFloatingView != null) {
-            mFloatingView.setVisibility(View.INVISIBLE);
-        }
-    }
 
     @Override
     public void onDestroy() {
@@ -620,14 +498,7 @@ public class RedRainService extends Service {
         cancelTimeAccount();
         mHandler.removeCallbacks(runnablePop);
         mHandler.removeCallbacks(runnableRain);
-        Log.i(TAG, "RedRainService   onDestroy --    App.isFloating: " + App.isFloating);
-        if (mFloatingView != null && mFloatingView.getVisibility() == View.VISIBLE) {
-            Log.i(TAG, "RedRainService   onDestroy --   mFloatingView VISIBLE ");
-            App.isFloating = true;
-        } else {
-            App.isFloating = false;
-        }
-        removeFloatingView();
+        Log.i(TAG, "RedRainService   onDestroy -- ");
     }
 
     //取消计时

@@ -32,7 +32,6 @@ public class MyActivityLifecycle implements Application.ActivityLifecycleCallbac
             App.getAppContext().setActivity(true);
             if (App.getAppContext().isRedRain()) {
                 Intent intent = new Intent(App.getAppContext(), RedRainService.class);
-                intent.putExtra(RedRainService.SHOWTYPE_KEY, RedRainService.TYPE_VISIBLE_FLOATING);
                 App.getAppContext().startService(intent);
             }
 
@@ -58,7 +57,6 @@ public class MyActivityLifecycle implements Application.ActivityLifecycleCallbac
             App.getAppContext().setActivity(false);
             if (App.getAppContext().isRedRain()) {
                 Intent intent = new Intent(App.getAppContext(), RedRainService.class);
-                intent.putExtra(RedRainService.SHOWTYPE_KEY, RedRainService.TYPE_GONE_FLOATING);
                 App.getAppContext().startService(intent);
             }
         }

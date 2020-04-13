@@ -18,8 +18,7 @@ public class App extends Application {
     private boolean isRedRain = false;
     //是否活动在前台
     private boolean isActivity = true;
-    //是否开启悬浮窗
-    public static boolean isFloating = false;
+
     private MyActivityLifecycle callback;
 
     public static App getAppContext() {
