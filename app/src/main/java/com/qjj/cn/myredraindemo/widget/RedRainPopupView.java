@@ -40,7 +40,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     private FrameLayout ll_root;
     private View line;
     private View rl_clock, btn_close;
-    private TextView tv_countdown;
+    private TextView tv_countdown,total_countTv;
     private RelativeLayout red_rain_view;
     private ImageView iv_clock;
     private RedPacketView redPacketsView;
@@ -179,6 +179,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         iv_clock = mainView.findViewById(R.id.iv_clock);
         redPacketsView = mainView.findViewById(R.id.red_packets_view);
         tv_countdown = mainView.findViewById(R.id.tv_countdown);
+        total_countTv = mainView.findViewById(R.id.total_count);
         btn_close.setOnClickListener(this);
         redPacketsView.setCount(20);
     }
@@ -282,6 +283,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
                     } else {
                         redPacketRainOpen(redPacket);
                         totalCount += 1;
+                        total_countTv.setText(totalCount+"");
                     }
                 } else {
                     redPacket.setType(RedPacketBean.TYPE_BOOM_BT);
@@ -343,7 +345,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
         RedPacketBean redPacketBean = new RedPacketBean();
         redPacketBean.setSymbol("1");
-        redPacketBean.setType(redPacket.getType());
+        redPacketBean.setType(RedPacketBean.TYPE_VALID_BT);
         redPacketBean.x = redPacket.x;
         redPacketBean.y = redPacket.y;
         setWinning(redPacketBean);
@@ -363,8 +365,8 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
             text = "+" + redPacket.getSymbol();
         }
         tv.setText(text);
-        tv.setTextColor(Color.parseColor("#FFBD00"));
-        tv.setTextSize(20);
+        tv.setTextColor(Color.parseColor("#FF4917"));
+        tv.setTextSize(30);
         tv.getPaint().setFakeBoldText(true);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins((int) redPacket.x, (int) redPacket.y, 0, 0);

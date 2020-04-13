@@ -16,6 +16,7 @@ import java.util.Random;
 public class RedPacketBean implements Parcelable {
     public static final int TYPE_PACKET_BT = 1;
     public static final int TYPE_BOOM_BT = 5; //爆炸
+    public static final int TYPE_VALID_BT = 4; //有效
 
     public float x, y;
     public float rotation;

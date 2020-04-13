@@ -201,7 +201,7 @@ public class RedRainService extends Service {
         rainOpenResponse.getData().setServerTime("1573091429");
         rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setDuration("10");
-        rainOpenResponse.getData().setPercent(80);
+        rainOpenResponse.getData().setPercent(10);
         rainOpenResponse.getData().setRedPacketRainId("561651651561");
         if (rainOpenResponse.getStatus() == 1) {
             RedRainActivityResponse.ResultEntity data = rainOpenResponse.getData();
