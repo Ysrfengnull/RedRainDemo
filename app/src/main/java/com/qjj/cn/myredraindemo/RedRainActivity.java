@@ -82,6 +82,7 @@ public class RedRainActivity extends Activity {
         redRainPopupView.setOnProgressListener(new RedRainPopupView.OnProgressListener() {
             @Override
             public void onStopRedRain(int number) {
+                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getSession(): " + redRainPopupView.getSession() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
                 dismiss();
             }
 

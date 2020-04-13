@@ -27,10 +27,8 @@ public class RedPacketBean implements Parcelable {
     public int width, height;
     public Bitmap bitmap;
 //    public boolean isRealRed;
-
-    private String contract;
     private String symbol;
-    private String money;
+
 
     private int mType = TYPE_PACKET_BT; //飘落物体的类型。
     private int mTypeIndex; //飘落物当前类型的索引（每帧自增）。
@@ -134,13 +132,7 @@ public class RedPacketBean implements Parcelable {
         this.num = num;
     }
 
-    public String getContract() {
-        return contract;
-    }
 
-    public void setContract(String contract) {
-        this.contract = contract;
-    }
 
     public String getSymbol() {
         return symbol;
@@ -150,13 +142,7 @@ public class RedPacketBean implements Parcelable {
         this.symbol = symbol;
     }
 
-    public String getMoney() {
-        return money;
-    }
 
-    public void setMoney(String money) {
-        this.money = money;
-    }
 
     @Override
     public String toString() {
@@ -169,9 +155,7 @@ public class RedPacketBean implements Parcelable {
                 ", width=" + width +
                 ", height=" + height +
                 ", bitmap=" + bitmap +
-                ", contract='" + contract + '\'' +
                 ", symbol='" + symbol + '\'' +
-                ", money='" + money + '\'' +
                 ", mType=" + mType +
                 ", mTypeIndex=" + mTypeIndex +
                 ", num=" + num +
@@ -193,9 +177,7 @@ public class RedPacketBean implements Parcelable {
         dest.writeInt(this.width);
         dest.writeInt(this.height);
 //        dest.writeParcelable(this.bitmap, flags);
-        dest.writeString(this.contract);
         dest.writeString(this.symbol);
-        dest.writeString(this.money);
         dest.writeInt(this.mType);
         dest.writeInt(this.mTypeIndex);
         dest.writeInt(this.num);
@@ -210,9 +192,7 @@ public class RedPacketBean implements Parcelable {
         this.width = in.readInt();
         this.height = in.readInt();
 //        this.bitmap = in.readParcelable(Bitmap.class.getClassLoader());
-        this.contract = in.readString();
         this.symbol = in.readString();
-        this.money = in.readString();
         this.mType = in.readInt();
         this.mTypeIndex = in.readInt();
         this.num = in.readInt();

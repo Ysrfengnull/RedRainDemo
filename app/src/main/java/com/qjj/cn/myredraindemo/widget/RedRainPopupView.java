@@ -1,5 +1,9 @@
 package com.qjj.cn.myredraindemo.widget;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,13 +25,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.qjj.cn.myredraindemo.R;
-import com.qjj.cn.myredraindemo.model.GetRedPacketRainOpenResponse;
 import com.qjj.cn.myredraindemo.model.RedPacketBean;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,7 +41,8 @@ import java.util.TimerTask;
  * Describe:红包雨弹窗View
  */
 public class RedRainPopupView extends RelativeLayout implements View.OnClickListener {
-
+    private FrameLayout ll_root;
+    private View line;
     private View rl_clock, btn_close;
     private TextView tv_countdown;
     private RelativeLayout red_rain_view;
@@ -89,7 +92,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      * 开红包累加金额集合
      */
     Map<String, Double> totalmoneysList = new HashMap<>();
-    private int index = 0;
     private Handler mHandler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -130,40 +132,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
                         stopRedRain();
                     }
                     duration--;
-                    break;
-
-
-                case 400:
-                    TextView mTextView = (TextView) msg.obj;
-                    if (mTextView != null) {
-                        mTextView.setVisibility(View.GONE);
-                        if (red_rain_view != null) {
-                            red_rain_view.removeView(mTextView);
-                        }
-                    }
-                    Bundle data = msg.getData();
-                    String moneyType = data.getString("moneyType");
-                    String contract = data.getString("contract");
-                    int redPackeType = data.getInt("redPackeType", 5);
-                    String money = data.getString("money");
-                    Log.i("RedRainMoney", " 添加金币  " + contract + " , " + moneyType + " , " + money);
-                    Log.i("TotalMoneys", " 获得金币  " + contract + " , " + moneyType + " , " + money);
-                    double parseDouble = Double.parseDouble(money);
-                    if (!totalmoneysList.containsKey(contract)) {
-                        setTotalMoneys(contract, moneyType, parseDouble, redPackeType);
-                    } else {
-                        Double aDouble = totalmoneysList.get(contract) + parseDouble;
-                        Iterator<Map.Entry<String, Double>> it = totalmoneysList.entrySet().iterator();
-                        while (it.hasNext()) {
-                            Map.Entry<String, Double> tab = it.next();
-                            String key = tab.getKey();
-                            if (key.equals(contract)) {
-                                it.remove();
-                                break;
-                            }
-                        }
-                        setTotalMoneys(contract, moneyType, aDouble, redPackeType);
-                    }
                     break;
             }
         }
@@ -214,6 +182,8 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     public void initView(Context context) {
         mContext = context;
         View mainView = LayoutInflater.from(context).inflate(R.layout.popupwindow_red_rain_layout, this, true);
+        ll_root = mainView.findViewById(R.id.ll_root);
+        line = mainView.findViewById(R.id.line);
         rl_clock = mainView.findViewById(R.id.rl_clock);
         btn_close = mainView.findViewById(R.id.btn_close);
         red_rain_view = mainView.findViewById(R.id.red_rain_view);
@@ -384,43 +354,22 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      * @param redPacket
      */
     private void redPacketRainOpen(final RedPacketBean redPacket) {
-        Map<String, String> map = new HashMap<>();
-        if (redPacket.getType() == RedPacketBean.TYPE_BOOM_GOLD) {
-            map.put("type", "1"); //1现金，2通证
-        } else {
-            map.put("type", "2");
-        }
-        map.put("redPacketRainId", redpacketrainid);//红包雨ID
-        map.put("times", String.valueOf(session));//	第几场雨
-
-        /**
-         * 此处为接口返回数据
-         */
-        GetRedPacketRainOpenResponse rainOpenResponse = new GetRedPacketRainOpenResponse();
-        rainOpenResponse.setCode(1);
-        rainOpenResponse.setStatus(1);
-        rainOpenResponse.setData(new GetRedPacketRainOpenResponse.ResultEntity());
-        rainOpenResponse.getData().setSymbol("获得红包");
-        rainOpenResponse.getData().setContract("");
-        rainOpenResponse.getData().setMoney("1");
-
-        if (rainOpenResponse.getStatus() == 1) {
-            GetRedPacketRainOpenResponse.ResultEntity data = rainOpenResponse.getData();
-            Log.i("RedRainMoney", " Post  " + data.getContract() + " , " + data.getSymbol() + " , " + data.getMoney());
+        session += 1;
+        if (true) {
             RedPacketBean redPacketBean = new RedPacketBean();
-            redPacketBean.setContract(data.getContract());
-            redPacketBean.setMoney(data.getMoney());
-            redPacketBean.setSymbol(data.getSymbol());
+            redPacketBean.setSymbol("1");
             redPacketBean.setType(redPacket.getType());
             redPacketBean.x = redPacket.x;
             redPacketBean.y = redPacket.y;
             setWinning(redPacketBean, true);
+            Log.i("RedRainMoney", " Post  " + redPacketBean.getSymbol()+" Winning= true" );
         } else {
             RedPacketBean redPacketBean = new RedPacketBean();
             redPacketBean.setType(redPacket.getType());
             redPacketBean.x = redPacket.x;
             redPacketBean.y = redPacket.y;
             setWinning(redPacketBean, false);
+            Log.i("RedRainMoney", " Post  "  + redPacketBean.getSymbol()+" Winning= false" );
         }
     }
 
@@ -429,41 +378,67 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
      */
     private synchronized void setWinning(final RedPacketBean redPacket, final boolean isWinning) {
         String text = "";
-        String money = "0";
-        String types = "";
         final TextView tv = new TextView(redPacketsView.getContext());
-
         if (isWinning) {
-            money = redPacket.getMoney();
-            types = redPacket.getSymbol();
             if (redPacket.getType() == RedPacketBean.TYPE_BOOM_BT) {
-                text = String.format("+%1$s%2$s", money, types);
+                text = "";
             } else {
-                text = "+" + money;
+                text = "+" + redPacket.getSymbol();
             }
-            if (text.contains(types)) {
-                // 字体颜色
-                int index = text.indexOf(types);
-                ForegroundColorSpan buleSpan = new ForegroundColorSpan(Color.parseColor("#FFFFFF"));
-                SpannableStringBuilder style = new SpannableStringBuilder(text);
-                style.setSpan(buleSpan, index, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                tv.setText(style);
-            } else {
-                tv.setText(text);
-            }
-        } else {
-            tv.setText(mContext.getString(R.string.happy_and_prosperous));
         }
-
+        tv.setText(text);
         tv.setTextColor(Color.parseColor("#FFBD00"));
         tv.setTextSize(20);
         tv.getPaint().setFakeBoldText(true);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins((int) redPacket.x, (int) redPacket.y, 0, 0);
-
         tv.setLayoutParams(lp);
         red_rain_view.addView(tv);
+        final float y = line.getY();
+        PropertyValuesHolder scaleYProper = PropertyValuesHolder.ofFloat("translationY", 0, -1300);
+        PropertyValuesHolder scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1, 1.1f);
+        PropertyValuesHolder scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1, 1.1f);
+        final ValueAnimator animator = ObjectAnimator.ofPropertyValuesHolder(tv, scaleYProper, scaleXHolder, scaleYHolder);
+        animator.setDuration(1400);
+        animator.start();
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (tv.getY() > 0 && tv.getY() <= y) {
+                    tv.setVisibility(View.GONE);
+                    animator.cancel();
+                }
 
+            }
+        });
+
+        Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (tv != null) {
+                    tv.setVisibility(View.GONE);
+                    if (red_rain_view != null) {
+                        red_rain_view.removeView(tv);
+                    }
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        };
+        animator.addListener(mAnimatorListener);
     }
 
     public void onDestroy() {
