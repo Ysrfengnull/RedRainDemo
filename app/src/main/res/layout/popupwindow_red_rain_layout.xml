@@ -34,7 +34,7 @@
                 android:layout_below="@+id/iv_1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="25dp"
-                android:src="@mipmap/red_clock_10" />
+                android:src="@mipmap/red_clock_3" />
 
         </RelativeLayout>
 

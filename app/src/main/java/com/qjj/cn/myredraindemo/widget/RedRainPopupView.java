@@ -1,9 +1,5 @@
 package com.qjj.cn.myredraindemo.widget;
 
-import android.animation.Animator;
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,14 +17,14 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.qjj.cn.myredraindemo.R;
 import com.qjj.cn.myredraindemo.model.GetRedPacketRainOpenResponse;
 import com.qjj.cn.myredraindemo.model.RedPacketBean;
 import com.qjj.cn.myredraindemo.util.SoundPoolUtil;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,9 +32,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * created by QinJiaJun
@@ -50,9 +42,6 @@ import androidx.annotation.Nullable;
 public class RedRainPopupView extends RelativeLayout implements View.OnClickListener {
 
     private View rl_clock, btn_close;
-
-    private ImageView iv_totalmoney1, iv_totalmoney2, iv_totalmoney3, iv_totalmoney4;
-    private TextView tv_totalmoney1, tv_totalmoney2, tv_totalmoney3, tv_totalmoney4;
     private TextView tv_countdown;
     private FrameLayout ll_root;
     private RelativeLayout red_rain_view;
@@ -119,21 +108,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
                 case 200:// 开始下红包雨
                     Log.i("RedRain", "RedRainPopupView   mHandler  300 倒计时中  countdown:" + countdown);
-                    if (countdown == 10) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_10);
-                    } else if (countdown == 9) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_9);
-                    } else if (countdown == 8) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_8);
-                    } else if (countdown == 7) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_7);
-                    } else if (countdown == 6) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_6);
-                    } else if (countdown == 5) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_5);
-                    } else if (countdown == 4) {
-                        iv_clock.setImageResource(R.mipmap.red_clock_4);
-                    } else if (countdown == 3) {
+                    if (countdown == 3) {
                         iv_clock.setImageResource(R.mipmap.red_clock_3);
                     } else if (countdown == 2) {
                         iv_clock.setImageResource(R.mipmap.red_clock_2);
@@ -240,9 +215,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
     public void initView(Context context) {
         mContext = context;
-
         View mainView = LayoutInflater.from(context).inflate(R.layout.popupwindow_red_rain_layout, this, true);
-
         ll_root = mainView.findViewById(R.id.ll_root);
         rl_clock = mainView.findViewById(R.id.rl_clock);
         btn_close = mainView.findViewById(R.id.btn_close);
@@ -426,18 +399,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     }
 
     /**
-     * dip----to---px
-     *
-     * @return
-     */
-    public static int dip2px(Context context, int dip) {
-        // 缩放比例(密度)
-        float density = context.getResources().getDisplayMetrics().density;
-        return (int) (dip * density + 0.5);
-    }
-
-
-    /**
      * 调用中奖打开红包接口
      *
      * @param redPacket
@@ -449,9 +410,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         } else {
             map.put("type", "2");
         }
-//        map.put("redPacketRainId", "5dbbef8cdabe713e880014ad");//红包雨ID
-//        map.put("times", String.valueOf(2));//	第几场雨
-
         map.put("redPacketRainId", redpacketrainid);//红包雨ID
         map.put("times", String.valueOf(session));//	第几场雨
 
@@ -552,61 +510,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         tv.setLayoutParams(lp);
         red_rain_view.addView(tv);
 
-        PropertyValuesHolder scaleYProper = PropertyValuesHolder.ofFloat("translationY", 0, -1300);
-        PropertyValuesHolder scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1, 1.1f);
-        PropertyValuesHolder scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1, 1.1f);
-
-        Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (mHandler == null) {
-                    return;
-                }
-                if (isWinning) {
-
-                    setMapData(tv, redPacket.getSymbol(), redPacket.getContract(), redPacket.getType(), redPacket.getMoney());
-                }
-                if (tv != null) {
-                    tv.setVisibility(View.GONE);
-                    if (red_rain_view != null) {
-                        red_rain_view.removeView(tv);
-                    }
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
-            }
-        };
     }
-
-    public int getContract_icon(String contract) {
-        if (contract.equals("AAA")){
-            return R.mipmap.red_rain_gold;
-        } else if (contract.equals("BBB")){
-            return R.mipmap.share_qq;
-        } else if (contract.equals("CCC")){
-            return R.mipmap.share_qq_zone;
-        } else if (contract.equals("DDD")){
-            return R.mipmap.share_wechat;
-        } else if (contract.equals("EEE")){
-            return R.mipmap.share_wechat_pyq;
-        } else {
-            return R.mipmap.share_weibo;
-        }
-    }
-
 
     public void onDestroy() {
         if (timer != null) {
@@ -635,31 +539,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         totalmoneysList.clear();
         totalmoneysList = null;
         mHandler = null;
-    }
-
-
-
-
-
-    private void setMapData(TextView mTextView, String moneyType, String contract, int redPackeType, String money) {
-        Log.i("RedRainMoney", " 添加金币  " + contract + " , " + moneyType + " , " + money);
-        Log.i("TotalMoneys", " 获得金币  " + contract + " , " + moneyType + " , " + money);
-        double parseDouble = Double.parseDouble(money);
-        if (!totalmoneysList.containsKey(contract)) {
-            setTotalMoneys(contract, moneyType, parseDouble, redPackeType);
-        } else {
-            Double aDouble = totalmoneysList.get(contract) + parseDouble;
-            Iterator<Map.Entry<String, Double>> it = totalmoneysList.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, Double> tab = it.next();
-                String key = tab.getKey();
-                if (key.equals(contract)) {
-                    it.remove();
-                    break;
-                }
-            }
-            setTotalMoneys(contract, moneyType, aDouble, redPackeType);
-        }
     }
 
 }

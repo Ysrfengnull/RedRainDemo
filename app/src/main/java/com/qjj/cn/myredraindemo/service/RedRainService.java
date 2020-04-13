@@ -219,7 +219,6 @@ public class RedRainService extends Service {
         Log.i(TAG, "RedRainService    onStartCommand  type: " + type);
         if (type == TYPE_START_REDRAIN) {
             if (App.isFloating) {
-//                showFloatingWindow();
                 mHandler.post(runnableRain);
                 return super.onStartCommand(intent, flags, startId);
             }
@@ -287,7 +286,7 @@ public class RedRainService extends Service {
         rainOpenResponse.setData(new RedRainActivityResponse.ResultEntity());
         rainOpenResponse.getData().setBeginTime("1573091440");
         rainOpenResponse.getData().setServerTime("1573091429");
-        rainOpenResponse.getData().setCountdown("10");
+        rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setForecast("10");
         rainOpenResponse.getData().setDuration("10");
         rainOpenResponse.getData().setInterval("10");
@@ -565,23 +564,6 @@ public class RedRainService extends Service {
             if (serverTime < countdownTime) {
                 long anHour = ((countdownTime - serverTime)) * 1000L; // 这是毫秒数
                 Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + anHour + "毫秒");
-
-                //方法一
-                /*Intent intent = new Intent(this, RedRainActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
-                bundle.putInt(SESSION_KEY, session);
-                bundle.putInt("type", 4);
-                intent.putExtra("data", bundle);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
-                pi = PendingIntent.getActivity(this, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    mAlarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-                } else {
-                    mAlarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-                }*/
 
                 //方法二
                 mHandler.postDelayed(runnableStartRain, anHour);
