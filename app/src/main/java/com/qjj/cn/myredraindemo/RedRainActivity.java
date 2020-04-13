@@ -1,15 +1,12 @@
 package com.qjj.cn.myredraindemo;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 
 import com.qjj.cn.myredraindemo.model.RedRainActivityResponse;
-import com.qjj.cn.myredraindemo.red_permission.FloatWinPermissionCompat;
 import com.qjj.cn.myredraindemo.service.RedRainService;
 import com.qjj.cn.myredraindemo.util.StatusBarUtil;
 import com.qjj.cn.myredraindemo.widget.RedRainPopupView;
@@ -31,11 +28,7 @@ public class RedRainActivity extends Activity {
      * 红包雨ID
      */
     private String redpacketrainid;
-    /**
-     * 场次  第几场红包雨
-     * 5
-     */
-    private int session = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,16 +47,11 @@ public class RedRainActivity extends Activity {
             Bundle bundleExtra = intent.getBundleExtra("data");
             if (bundleExtra != null) {
                 RedRainActivityResponse.ResultEntity data = bundleExtra.getParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY);
-                this.session = bundleExtra.getInt(RedRainService.SESSION_KEY, 1);
-                redRainPopupView.setSession(session);
                 this.type = bundleExtra.getInt("type", 4);
-                Log.i("RedRain", "RedRainActivity initView   intent  type: " + type + "    session:" + session + "  data:" + data.toString());
+                Log.i("RedRain", "RedRainActivity initView   intent  type: " + type + "  data:" + data.toString());
                 getDataToUI(data);
             } else {
                 this.type = intent.getIntExtra("type", 0);
-                this.session = intent.getIntExtra(RedRainService.SESSION_KEY, 0);
-                Log.i("RedRain", "RedRainActivity initView   intent  type: " + type + "    session:" + session);
-                redRainPopupView.setSession(session);
                 if (type == 2) {
                     int duration = intent.getIntExtra(RedRainService.DURATION_KEY, 0);
                     int countdown = intent.getIntExtra(RedRainService.COUNTDOWN_KEY, 0);
@@ -91,14 +79,14 @@ public class RedRainActivity extends Activity {
 
             @Override
             public void onEnd(boolean isAdd) {
-                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getSession(): " + redRainPopupView.getSession() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid + "  session: " + session);
+                Log.i("RedRain", "StartRedRain   RedRainActivity    onEnd  getSession(): " + redRainPopupView.getSession() + "  getRedpacketrainid(): " + redRainPopupView.getRedpacketrainid() + "   redpacketrainid: " + redpacketrainid );
                 //红包雨结算界面  由于一些原因 暂时不公开
                 dismiss();
             }
         });
 
         redRainPopupView.run();
-        Log.i("RedRain", "StartRedRain  RedRainActivity    intent   redpacketrainid: " + redpacketrainid + "  session: " + session);
+        Log.i("RedRain", "StartRedRain  RedRainActivity    intent   redpacketrainid: " + redpacketrainid);
     }
 
     private void initData() {
@@ -132,7 +120,6 @@ public class RedRainActivity extends Activity {
     private void getRedPacketData() {
         Map<String, String> stringMap = new HashMap<>();
         stringMap.put("redPacketRainId", redpacketrainid);
-        stringMap.put("times", String.valueOf(session));
         //请求服务器
     }
 

@@ -69,8 +69,6 @@ public class RedRainActivityResponse implements Parcelable {
         private String forecast;    // 提前预报 单位秒
         private String countdown;   //  倒计时，单位秒
         private String duration;    // 下雨持续时长，单位秒
-        private String times;       //  总场次
-        private String interval;    //  场次间隔时长，单位秒
         private String types;    // "2,1"  包含红包大类，1现金，2其他币种
         private int percent;     //中奖率
 
@@ -130,21 +128,7 @@ public class RedRainActivityResponse implements Parcelable {
             this.duration = duration;
         }
 
-        public String getTimes() {
-            return times;
-        }
 
-        public void setTimes(String times) {
-            this.times = times;
-        }
-
-        public String getInterval() {
-            return interval;
-        }
-
-        public void setInterval(String interval) {
-            this.interval = interval;
-        }
 
         public String getTypes() {
             return types;
@@ -172,8 +156,6 @@ public class RedRainActivityResponse implements Parcelable {
                     ", forecast='" + forecast + '\'' +
                     ", countdown='" + countdown + '\'' +
                     ", duration='" + duration + '\'' +
-                    ", times='" + times + '\'' +
-                    ", interval='" + interval + '\'' +
                     ", types='" + types + '\'' +
                     ", percent='" + percent + '\'' +
                     '}';
@@ -193,8 +175,6 @@ public class RedRainActivityResponse implements Parcelable {
             dest.writeString(this.forecast);
             dest.writeString(this.countdown);
             dest.writeString(this.duration);
-            dest.writeString(this.times);
-            dest.writeString(this.interval);
             dest.writeString(this.types);
             dest.writeInt(this.percent);
         }
@@ -210,8 +190,6 @@ public class RedRainActivityResponse implements Parcelable {
             this.forecast = in.readString();
             this.countdown = in.readString();
             this.duration = in.readString();
-            this.times = in.readString();
-            this.interval = in.readString();
             this.types = in.readString();
             this.percent = in.readInt();
         }

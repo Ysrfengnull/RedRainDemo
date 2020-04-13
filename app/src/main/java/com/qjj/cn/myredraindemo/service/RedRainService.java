@@ -49,7 +49,6 @@ public class RedRainService extends Service {
     public static final String DURATION_KEY = "DURATION_KEY";
     public static final String COUNTDOWN_KEY = "COUNTDOWN_KEY";
     public static final String TYPES_KEY = "TYPES_KEY";
-    public static final String SESSION_KEY = "SESSION_KEY";
     public static final String REDPACKETRAINID_KEY = "redPacketRainId";
     public static final String PERCENT_KEY = "PERCENT_KEY";
     public static final String REDRAINACTIVITYRESPONSE_KEY = "REDRAINACTIVITYRESPONSE_KEY";
@@ -84,14 +83,6 @@ public class RedRainService extends Service {
      * 中奖率
      */
     private int percent = 100;
-    /**
-     * 当前场次
-     */
-    private int session = 0;
-    /**
-     * 总场次
-     */
-    private int times; //总场次
 
     private String redpacketrainid; //红包雨ID
     /**
@@ -175,7 +166,6 @@ public class RedRainService extends Service {
                 Intent intent = new Intent(RedRainService.this, RedRainActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
-                bundle.putInt(SESSION_KEY, session);
                 bundle.putInt("type", 4);
                 intent.putExtra("data", bundle);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -235,7 +225,6 @@ public class RedRainService extends Service {
             countdown = intent.getIntExtra(COUNTDOWN_KEY, 0);
             types = intent.getStringExtra(TYPES_KEY);
             redpacketrainid = intent.getStringExtra(REDPACKETRAINID_KEY);
-            session = intent.getIntExtra(SESSION_KEY, 1);
             if (mTimer == null) {
                 mTimer = new Timer();
             }
@@ -289,10 +278,8 @@ public class RedRainService extends Service {
         rainOpenResponse.getData().setCountdown("3");
         rainOpenResponse.getData().setForecast("10");
         rainOpenResponse.getData().setDuration("10");
-        rainOpenResponse.getData().setInterval("10");
         rainOpenResponse.getData().setPercent(80);
         rainOpenResponse.getData().setRedPacketRainId("561651651561");
-        rainOpenResponse.getData().setTimes("1");
         rainOpenResponse.getData().setTypes("1,2");
         if (rainOpenResponse.getStatus() == 1) {
             RedRainActivityResponse.ResultEntity data = rainOpenResponse.getData();
@@ -319,10 +306,6 @@ public class RedRainService extends Service {
             if (mAlarmManager == null) {
                 mAlarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             }
-            //总场次
-            times = Integer.parseInt(data.getTimes());
-            //场次间隔时长，单位秒
-            int interval = Integer.parseInt(data.getInterval());
             //下雨持续时长，单位秒
             int duration = Integer.parseInt(data.getDuration());
             //开始倒计时时间 ，时间戳
@@ -331,67 +314,45 @@ public class RedRainService extends Service {
             Long serverTime = Long.parseLong(data.getServerTime());
             //开始下雨时间 ，时间戳
             Long beginTime = Long.parseLong(data.getBeginTime());
-            //红包雨活动结束时间 ，时间戳
-            Long overTime = (beginTime + ((times - 1) * interval)) + duration;
+            //每场开始时间
+            Long startTime = (beginTime );
             try {
                 Log.i(TAG, "RedRainService   startRedPacketRainAlarm  " +
                         "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                        "   beginTime: " + data.getBeginTime() + "  " + DateUtils.longToString(beginTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                        "   overTime: " + overTime + "  " + DateUtils.longToString(overTime * 1000L, "yyyy-MM-dd HH:mm:ss")
+                        "   beginTime: " + data.getBeginTime() + "  " + DateUtils.longToString(beginTime * 1000L, "yyyy-MM-dd HH:mm:ss")
 
                 );
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (serverTime < overTime) {
-                //循环场次
-                for (int i = 0; i <= times; i++) {
-                    session = i + 1;
-                    int mysession = i + 1;
-                    Log.i(TAG, "RedRainService   startRedPacketRainAlarm  第" + mysession + "场红包雨");
-                    //每场开始时间
-                    Long startTime = (beginTime + (interval * i));
-                    //每场开始倒计时任务时间
-                    Long countdownTime = startTime - countdown;
-                    //每次红包结束时间
-                    Long endTime = startTime + duration;
-                    try {
-                        Log.i(TAG, "StartRedRain  RedRainService   startRedPacketRainAlarm 第" + session + "场  " +
-                                "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                                "   startTime: " + startTime + "  " + DateUtils.longToString(startTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                                "   countdownTime: " + countdownTime + "  " + DateUtils.longToString(countdownTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                                "   endTime: " + endTime + "  " + DateUtils.longToString(endTime * 1000L, "yyyy-MM-dd HH:mm:ss"));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+            //每场开始倒计时任务时间
+            Long countdownTime = startTime - countdown;
+            //每次红包结束时间
+            Long endTime = startTime + duration;
+            try {
+                Log.i(TAG, "StartRedRain  RedRainService   startRedPacketRainAlarm "+
+                        "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
+                        "   startTime: " + startTime + "  " + DateUtils.longToString(startTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
+                        "   countdownTime: " + countdownTime + "  " + DateUtils.longToString(countdownTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
+                        "   endTime: " + endTime + "  " + DateUtils.longToString(endTime * 1000L, "yyyy-MM-dd HH:mm:ss"));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
-                    if (serverTime < startTime) {
-                        Log.i(TAG, "RedRainService  serverTime < startTime   getStartTimeToTask ");
-                        App.getAppContext().setRedRain(true);
-                        getStartTimeToTask(serverTime, startTime, data, mysession);
-                        return;
-                    } else if (serverTime == startTime) {
-                        App.getAppContext().setRedRain(true);
-                        Log.i(TAG, "RedRainService  serverTime == startTime   setStartRedRainActivity ");
-                        if (App.isFloating) {
-                            setVisibleFloatingTask(0, duration, data.getRedPacketRainId(), mysession, data.getTypes());
-                            return;
-                        }
-                        setStartRedRainActivity(duration, 0, data.getTypes(), 2, mysession);
-                        return;
-                    } else {
-                        if (serverTime < endTime) {
-                            Log.i(TAG, "RedRainService  serverTime < endTime   setStartRedRainActivity ");
-                            App.getAppContext().setRedRain(true);
-                            if (App.isFloating) {
-                                setVisibleFloatingTask(0, (int) (endTime - serverTime), data.getRedPacketRainId(), mysession, data.getTypes());
-                                return;
-                            }
-                            setStartRedRainActivity((int) (endTime - serverTime), 0, data.getTypes(), 2, mysession);
-                            return;
-                        }
-                    }
+            if (serverTime < startTime) {
+                Log.i(TAG, "RedRainService  serverTime < startTime   getStartTimeToTask ");
+                App.getAppContext().setRedRain(true);
+                getStartTimeToTask(serverTime, startTime, data);
+                return;
+            } else if (serverTime == startTime) {
+                App.getAppContext().setRedRain(true);
+                Log.i(TAG, "RedRainService  serverTime == startTime   setStartRedRainActivity ");
+                if (App.isFloating) {
+                    setVisibleFloatingTask(0, duration, data.getRedPacketRainId(), data.getTypes());
+                    return;
                 }
+                setStartRedRainActivity(duration, 0, data.getTypes(), 2);
+                return;
             } else {
                 Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动时间已超出  活动结束了");
                 App.getAppContext().setRedRain(false);
@@ -429,7 +390,6 @@ public class RedRainService extends Service {
                 intent.putExtra(RedRainService.COUNTDOWN_KEY, countdown);
                 intent.putExtra(RedRainService.TYPES_KEY, types);
                 intent.putExtra(RedRainService.REDPACKETRAINID_KEY, redpacketrainid);
-                intent.putExtra(RedRainService.SESSION_KEY, session);
                 intent.putExtra(RedRainService.PERCENT_KEY, percent);
 
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -500,12 +460,11 @@ public class RedRainService extends Service {
      * @param countdown
      * @param duration
      * @param redpacketrainid
-     * @param session
      * @param types
      */
-    private void setVisibleFloatingTask(int countdown, int duration, String redpacketrainid, int session, String types) {
+    private void setVisibleFloatingTask(int countdown, int duration, String redpacketrainid,  String types) {
         this.redpacketrainid = redpacketrainid;
-        this.session = session;
+
         this.countdown = countdown;
         this.duration = duration;
         this.types = types;
@@ -540,10 +499,9 @@ public class RedRainService extends Service {
      * @param serverTime 服务器当前时间  12:30:00
      * @param startTime  开始时间
      * @param data
-     * @param session    场次
      */
-    private void getStartTimeToTask(Long serverTime, Long startTime, RedRainActivityResponse.ResultEntity data, int session) {
-        Log.i(TAG, "StartRedRain  RedRainService   getStartTimeToTask  第" + session + "场红包雨");
+    private void getStartTimeToTask(Long serverTime, Long startTime, RedRainActivityResponse.ResultEntity data) {
+        Log.i(TAG, "StartRedRain  RedRainService   getStartTimeToTask  " +"红包雨");
         Log.i(TAG, "RedRainService   getStartTimeToTask  RedRainActivityResponse data: " + data.toString());
         this.data = data;
         this.percent = data.getPercent();
@@ -571,28 +529,27 @@ public class RedRainService extends Service {
             } else if (serverTime == countdownTime) {
                 Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时中 " + "正好10秒");
                 if (App.isFloating) {
-                    setVisibleFloatingTask(countdown, duration, data.getRedPacketRainId(), session, data.getTypes());
+                    setVisibleFloatingTask(countdown, duration, data.getRedPacketRainId(), data.getTypes());
                     return;
                 }
                 startRedRainActivity(data, 0, 1);
             } else {
                 if (serverTime < startTime) {
                     if (App.isFloating) {
-                        setVisibleFloatingTask((int) (startTime - serverTime), duration, data.getRedPacketRainId(), session, data.getTypes());
+                        setVisibleFloatingTask((int) (startTime - serverTime), duration, data.getRedPacketRainId(), data.getTypes());
                         return;
                     }
-                    setStartRedRainActivity(duration, (int) (startTime - serverTime), data.getTypes(), 2, session);
+                    setStartRedRainActivity(duration, (int) (startTime - serverTime), data.getTypes(), 2);
                     Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 即将到来 倒计时秒： " + (int) (startTime - serverTime));
                 } else {
                     Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨活动 进行中 ");
                     if (App.isFloating) {
-                        setVisibleFloatingTask(0, (int) ((startTime + duration) - serverTime), data.getRedPacketRainId(), session, data.getTypes());
+                        setVisibleFloatingTask(0, (int) ((startTime + duration) - serverTime), data.getRedPacketRainId(), data.getTypes());
                         return;
                     }
-                    setStartRedRainActivity((int) ((startTime + duration) - serverTime), 0, data.getTypes(), 2, session);
+                    setStartRedRainActivity((int) ((startTime + duration) - serverTime), 0, data.getTypes(), 2);
                 }
             }
-            this.session = session;
             this.redpacketrainid = data.getRedPacketRainId();
         } else {
             Log.i(TAG, "RedRainService   getStartTimeToTask   红包雨 活动时间结束了");
@@ -604,14 +561,12 @@ public class RedRainService extends Service {
         Intent i = new Intent(this, RedRainActivity.class);
         i.putExtra(RedRainService.REDRAINACTIVITYRESPONSE_KEY, data);
         i.putExtra("type", type);
-        i.putExtra(SESSION_KEY, session);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }
 
-    private void setStartRedRainActivity(int duration, int countdown, String types, int type, int session) {
+    private void setStartRedRainActivity(int duration, int countdown, String types, int type) {
         this.redpacketrainid = redpacketrainid;
-        this.session = session;
         this.countdown = countdown;
         this.duration = duration;
         this.types = types;
@@ -620,7 +575,6 @@ public class RedRainService extends Service {
         intent.putExtra(RedRainService.DURATION_KEY, duration);
         intent.putExtra(RedRainService.COUNTDOWN_KEY, countdown);
         intent.putExtra(RedRainService.TYPES_KEY, types);
-        intent.putExtra(RedRainService.SESSION_KEY, session);
         intent.putExtra(RedRainService.REDPACKETRAINID_KEY, redpacketrainid);
         intent.putExtra(RedRainService.PERCENT_KEY, percent);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
