@@ -693,15 +693,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
                     return;
                 }
                 if (isWinning) {
-                    /*Message message = mHandler.obtainMessage(400);
-                    message.obj = tv;
-                    Bundle mBundle = new Bundle();
-                    mBundle.putString("moneyType", redPacket.getSymbol());
-                    mBundle.putString("money", redPacket.getMoney());
-                    mBundle.putString("contract", redPacket.getContract());
-                    mBundle.putInt("redPackeType", redPacket.getType());
-                    message.setData(mBundle);
-                    mHandler.sendMessage(message);*/
 
                     setMapData(tv, redPacket.getSymbol(), redPacket.getContract(), redPacket.getType(), redPacket.getMoney());
                 }
@@ -772,40 +763,9 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         mHandler = null;
     }
 
-    /**
-     * 设置上次操作的数据 并显示UI
-     *
-     * @param data
-     */
-/*    public void setMoneyTotalsData(List<RedPacketRainMoneyTotalResponse.DataBean> data) {
-        if (data != null && data.size() > 0) {
-            for (int i = 0; i < data.size(); i++) {
-                RedPacketRainMoneyTotalResponse.DataBean dataBean = data.get(i);
-                totalmoneysList.put(dataBean.getContract(), Double.parseDouble(dataBean.getMoney()));
-                if (i == 0) {
-                    getDataToUI(dataBean.getContract(), dataBean.getMoney(), rl_totalmoney1, iv_totalmoney1, tv_totalmoney1);
 
-                } else if (i == 1) {
-                    getDataToUI(dataBean.getContract(), dataBean.getMoney(), rl_totalmoney2, iv_totalmoney2, tv_totalmoney2);
 
-                } else if (i == 2) {
-                    getDataToUI(dataBean.getContract(), dataBean.getMoney(), rl_totalmoney3, iv_totalmoney3, tv_totalmoney3);
 
-                } else if (i == 3) {
-                    getDataToUI(dataBean.getContract(), dataBean.getMoney(), rl_totalmoney4, iv_totalmoney4, tv_totalmoney4);
-                }
-            }
-        }
-    }*/
-
-    /**
-     * 获取在红包雨活动中获得的金额总数
-     *
-     * @return
-     */
-    public Map<String, Double> getMoneyTotalsData() {
-        return this.totalmoneysList;
-    }
 
     private void setMapData(TextView mTextView, String moneyType, String contract, int redPackeType, String money) {
         Log.i("RedRainMoney", " 添加金币  " + contract + " , " + moneyType + " , " + money);
