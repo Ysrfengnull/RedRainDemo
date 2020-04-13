@@ -49,8 +49,8 @@ import androidx.annotation.Nullable;
  */
 public class RedRainPopupView extends RelativeLayout implements View.OnClickListener {
 
-    private View rl_clock, btn_close, rl_content, line;
-    private View rl_totalmoney1, rl_totalmoney2, rl_totalmoney3, rl_totalmoney4;
+    private View rl_clock, btn_close;
+
     private ImageView iv_totalmoney1, iv_totalmoney2, iv_totalmoney3, iv_totalmoney4;
     private TextView tv_totalmoney1, tv_totalmoney2, tv_totalmoney3, tv_totalmoney4;
     private TextView tv_countdown;
@@ -244,29 +244,12 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         View mainView = LayoutInflater.from(context).inflate(R.layout.popupwindow_red_rain_layout, this, true);
 
         ll_root = mainView.findViewById(R.id.ll_root);
-        line = mainView.findViewById(R.id.line);
-        rl_content = mainView.findViewById(R.id.rl_content);
         rl_clock = mainView.findViewById(R.id.rl_clock);
         btn_close = mainView.findViewById(R.id.btn_close);
         red_rain_view = mainView.findViewById(R.id.red_rain_view);
         iv_clock = mainView.findViewById(R.id.iv_clock);
         redPacketsView = mainView.findViewById(R.id.red_packets_view);
         redPacketsView.setCount(50);
-        rl_totalmoney1 = mainView.findViewById(R.id.rl_totalmoney1);
-        rl_totalmoney2 = mainView.findViewById(R.id.rl_totalmoney2);
-        rl_totalmoney3 = mainView.findViewById(R.id.rl_totalmoney3);
-        rl_totalmoney4 = mainView.findViewById(R.id.rl_totalmoney4);
-
-        iv_totalmoney1 = mainView.findViewById(R.id.iv_totalmoney1);
-        iv_totalmoney2 = mainView.findViewById(R.id.iv_totalmoney2);
-        iv_totalmoney3 = mainView.findViewById(R.id.iv_totalmoney3);
-        iv_totalmoney4 = mainView.findViewById(R.id.iv_totalmoney4);
-
-        tv_totalmoney1 = mainView.findViewById(R.id.tv_totalmoney1);
-        tv_totalmoney2 = mainView.findViewById(R.id.tv_totalmoney2);
-        tv_totalmoney3 = mainView.findViewById(R.id.tv_totalmoney3);
-        tv_totalmoney4 = mainView.findViewById(R.id.tv_totalmoney4);
-
         tv_countdown = mainView.findViewById(R.id.tv_countdown);
         btn_close.setOnClickListener(this);
     }
@@ -429,102 +412,7 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
         synchronized (this) {
             Log.i("TotalMoneys", " 累加金币  " + contract + " , " + moneyType + " , " + money);
             totalmoneysList.put(contract, money);
-            getIndexToUI(contract, moneyType, money, redPackeType);
-        }
-
-    }
-
-    private int setIndex(String type) {
-        String tag1 = (String) rl_totalmoney1.getTag();
-        String tag2 = (String) rl_totalmoney2.getTag();
-        String tag3 = (String) rl_totalmoney3.getTag();
-        String tag4 = (String) rl_totalmoney4.getTag();
-//        Log.i("RedRain", "RedRainPopupView   getIndexToUI    type:" + type + "  tag1: " + tag1 + "  tag2: " + tag2 + "  tag3: " + tag3 + "  tag4: " + tag4);
-        if (type.equals(tag1)) {
-            index = 0;
-        } else if (type.equals(tag2)) {
-            index = 1;
-        } else if (type.equals(tag3)) {
-            index = 2;
-        } else if (type.equals(tag4)) {
-            index = 3;
-        } else {
-            if (TextUtils.isEmpty(tag1)) {
-                index = 0;
-            } else if (TextUtils.isEmpty(tag2)) {
-                index = 1;
-            } else if (TextUtils.isEmpty(tag3)) {
-                index = 2;
-            } else if (TextUtils.isEmpty(tag4)) {
-                index = 3;
-            }
-        }
-        return index;
-    }
-
-    private void getIndexToUI(String contract, String type, double money, int redPackeType) {
-        int caseIndex = setIndex(contract);
-        switch (caseIndex) {
-            case 0:
-                rl_totalmoney1.setVisibility(View.VISIBLE);
-                rl_totalmoney1.setTag(contract);
-                tv_totalmoney1.setTag(contract);
-                getTypeToUI(contract, type, money, iv_totalmoney1, tv_totalmoney1, redPackeType);
-                break;
-
-            case 1:
-                rl_totalmoney2.setVisibility(View.VISIBLE);
-                rl_totalmoney2.setTag(contract);
-                tv_totalmoney2.setTag(contract);
-                getTypeToUI(contract, type, money, iv_totalmoney2, tv_totalmoney2, redPackeType);
-                break;
-
-            case 2:
-                rl_totalmoney3.setVisibility(View.VISIBLE);
-                rl_totalmoney3.setTag(contract);
-                tv_totalmoney3.setTag(contract);
-                getTypeToUI(contract, type, money, iv_totalmoney3, tv_totalmoney3, redPackeType);
-                break;
-
-            case 3:
-                rl_totalmoney4.setVisibility(View.VISIBLE);
-                rl_totalmoney4.setTag(contract);
-                tv_totalmoney4.setTag(contract);
-                getTypeToUI(contract, type, money, iv_totalmoney4, tv_totalmoney4, redPackeType);
-                break;
-        }
-        index++;
-    }
-
-    private void getTypeToUI(String contract, String type, double money, ImageView iv_totalmoney, TextView tv_totalmoney, int redPackeType) {
-        if (mSoundPoolUtil == null) {
-            mSoundPoolUtil = SoundPoolUtil.getInstance(mContext);
-        }
-        int url = getContract_icon(contract);
-        RequestOptions options = new RequestOptions()
-                .error(R.mipmap.red_rain_placeholder)
-                .placeholder(R.mipmap.red_rain_placeholder);
-        Glide.with(mContext).load(url).apply(options).into(iv_totalmoney);
-
-        if (redPackeType == RedPacketBean.TYPE_BOOM_GOLD || redPackeType == RedPacketBean.TYPE_PACKET_GOLD) {
-            tv_totalmoney.setText("+" + String.format("%.2f", money));
-        } else {
-            BigDecimal bd1 = new BigDecimal(Double.toString(money));
-            tv_totalmoney.setText("+" + String.format("%.6f", Double.parseDouble(bd1.toPlainString())));
-        }
-        mSoundPoolUtil.play(1);
-    }
-
-    private void getDataToUI(String contract, String text, View rl_totalmoney, ImageView iv_totalmoney, TextView tv_totalmoney) {
-        RequestOptions options = new RequestOptions()
-                .error(R.mipmap.red_rain_placeholder)
-                .placeholder(R.mipmap.red_rain_placeholder);
-        Glide.with(mContext).load(getContract_icon(contract)).apply(options).into(iv_totalmoney);
-        tv_totalmoney.setText("+" + text);
-        rl_totalmoney.setVisibility(View.VISIBLE);
-        if (rl_totalmoney != null && tv_totalmoney != null) {
-            rl_totalmoney.setTag(contract);
-            tv_totalmoney.setTag(contract);
+ //更新个数
         }
 
     }
@@ -663,23 +551,10 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
         tv.setLayoutParams(lp);
         red_rain_view.addView(tv);
-        final float y = line.getY();
+
         PropertyValuesHolder scaleYProper = PropertyValuesHolder.ofFloat("translationY", 0, -1300);
         PropertyValuesHolder scaleXHolder = PropertyValuesHolder.ofFloat("scaleX", 1, 1.1f);
         PropertyValuesHolder scaleYHolder = PropertyValuesHolder.ofFloat("scaleY", 1, 1.1f);
-        final ValueAnimator animator = ObjectAnimator.ofPropertyValuesHolder(tv, scaleYProper, scaleXHolder, scaleYHolder);
-        animator.setDuration(1400);
-        animator.start();
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (tv.getY() > 0 && tv.getY() <= y) {
-                    tv.setVisibility(View.GONE);
-                    animator.cancel();
-                }
-
-            }
-        });
 
         Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
             @Override
@@ -714,7 +589,6 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
 
             }
         };
-        animator.addListener(mAnimatorListener);
     }
 
     public int getContract_icon(String contract) {
