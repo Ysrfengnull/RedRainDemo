@@ -61,9 +61,9 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
     private long numberTime = 60 * 1000L;
     /**
      * 红包雨持续的时间
-     * 60 秒
+     * 10 秒
      */
-    private int duration = 60;
+    private int duration = 10;
 
     /**
      * 有效红包总个数
@@ -86,8 +86,9 @@ public class RedRainPopupView extends RelativeLayout implements View.OnClickList
             switch (msg.what) {
                 case 100:
                     numberTime = numberTime - 125;
+
                     if (numberTime > 0) {
-                        tv_countdown.setText(formatter.format(new Date(numberTime)));
+                        tv_countdown.setText(duration+"");
                     } else {
                         numberTime = 0;
                         stopTask.cancel();
