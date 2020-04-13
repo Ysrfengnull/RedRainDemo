@@ -41,8 +41,6 @@ public class RedRainService extends Service {
     private static final String TAG = "RedRain";
     public static final String SHOWTYPE_KEY = "SHOWTYPE_KEY";
     public static final int TYPE_START_REDRAIN = 100;
-    public static final int TYPE_LANGUAGE = 105;
-
     public static final String DURATION_KEY = "DURATION_KEY";
     public static final String COUNTDOWN_KEY = "COUNTDOWN_KEY";
     public static final String TYPES_KEY = "TYPES_KEY";
@@ -208,15 +206,6 @@ public class RedRainService extends Service {
                     mHandler.post(runnableRain);
                 }
             }, 100);
-        }else if (type == TYPE_LANGUAGE) {
-            Log.i(TAG, "RedRainService   onStartCommand  TYPE_LANGUAGE  mFloatingView INVISIBLE ");
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    showFloatingWindow();
-                    mHandler.post(runnableRain);
-                }
-            }, 1000);
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -234,7 +223,6 @@ public class RedRainService extends Service {
         rainOpenResponse.getData().setBeginTime("1573091440");
         rainOpenResponse.getData().setServerTime("1573091429");
         rainOpenResponse.getData().setCountdown("3");
-        rainOpenResponse.getData().setForecast("10");
         rainOpenResponse.getData().setDuration("10");
         rainOpenResponse.getData().setPercent(80);
         rainOpenResponse.getData().setRedPacketRainId("561651651561");
@@ -284,14 +272,13 @@ public class RedRainService extends Service {
                 e.printStackTrace();
             }
             //每场开始倒计时任务时间
-            Long countdownTime = startTime - countdown;
+
             //每次红包结束时间
             Long endTime = startTime + duration;
             try {
                 Log.i(TAG, "StartRedRain  RedRainService   startRedPacketRainAlarm "+
                         "serverTime: " + data.getServerTime() + "  " + DateUtils.longToString(serverTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
                         "   startTime: " + startTime + "  " + DateUtils.longToString(startTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
-                        "   countdownTime: " + countdownTime + "  " + DateUtils.longToString(countdownTime * 1000L, "yyyy-MM-dd HH:mm:ss") +
                         "   endTime: " + endTime + "  " + DateUtils.longToString(endTime * 1000L, "yyyy-MM-dd HH:mm:ss"));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -313,105 +300,6 @@ public class RedRainService extends Service {
                 onDestroy();
             }
         }
-    }
-
-    private void showFloatingWindow() {
-        //Android 8  对悬浮窗 进行了 改变
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            mLayoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-        }
-        mLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        mLayoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        //View以外的区域可以响应点击和触摸事件
-        mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        //设置位图格式 默认是不透明的
-        mLayoutParams.format = PixelFormat.TRANSPARENT;
-        //初始化位置
-        mLayoutParams.x = 10;
-        mLayoutParams.y = 100;
-    }
-
-
-    private class FloatingOnTouchListener implements View.OnTouchListener {
-        //开始触控的坐标，移动时的坐标（相对于屏幕左上角的坐标）
-        private int mTouchStartX, mTouchStartY, mTouchCurrentX, mTouchCurrentY;
-        //开始时的坐标和结束时的坐标（相对于自身控件的坐标）
-        private int mStartX, mStartY, mStopX, mStopY;
-        //判断悬浮窗口是否移动，这里做个标记，防止移动后松手触发了点击事件
-        private boolean isMove;
-
-        @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            int action = event.getAction();
-
-            switch (action) {
-                case MotionEvent.ACTION_DOWN:
-                    isMove = false;
-                    mTouchStartX = (int) event.getRawX();
-                    mTouchStartY = (int) event.getRawY();
-                    mStartX = (int) event.getX();
-                    mStartY = (int) event.getY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    mTouchCurrentX = (int) event.getRawX();
-                    mTouchCurrentY = (int) event.getRawY();
-                    mLayoutParams.x += mTouchCurrentX - mTouchStartX;
-                    mLayoutParams.y += mTouchCurrentY - mTouchStartY;
-                    mTouchStartX = mTouchCurrentX;
-                    mTouchStartY = mTouchCurrentY;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    mStopX = (int) event.getX();
-                    mStopY = (int) event.getY();
-                    if (Math.abs(mStartX - mStopX) >= 1 || Math.abs(mStartY - mStopY) >= 1) {
-                        isMove = true;
-                    }
-                    break;
-            }
-            //如果是移动事件不触发OnClick事件，防止移动的时候一放手形成点击事件
-            return isMove;
-        }
-    }
-
-    /**
-     * 在显示悬浮窗得情况下 切换语言 重走生命周期
-     *
-     * @param countdown
-     * @param duration
-     * @param redpacketrainid
-     * @param types
-     */
-    private void setVisibleFloatingTask(int countdown, int duration, String redpacketrainid,  String types) {
-        this.redpacketrainid = redpacketrainid;
-
-        this.countdown = countdown;
-        this.duration = duration;
-        this.types = types;
-        Log.i(TAG, "RedRainService   setVisibleFloatingTask   开启悬浮窗任务");
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-
-        if (countDownTask != null) {
-            countDownTask.cancel();
-            mTimer = null;
-        }
-        mHandler.removeMessages(200);
-
-        if (mTimer == null) {
-            mTimer = new Timer();
-        }
-        countDownTask = new TimerTask() {
-            @Override
-            public void run() {
-                mHandler.sendEmptyMessage(200);
-            }
-        };
-
-        mTimer.schedule(countDownTask, 0, 1000);
     }
 
     /**

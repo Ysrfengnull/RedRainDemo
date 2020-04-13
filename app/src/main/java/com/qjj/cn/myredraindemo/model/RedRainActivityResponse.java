@@ -66,7 +66,6 @@ public class RedRainActivityResponse implements Parcelable {
         private String subject;     // 红包雨标题
         private String serverTime;  // 服务器当前时间，时间戳
         private String beginTime;   // 开始下雨时间 ，时间戳
-        private String forecast;    // 提前预报 单位秒
         private String countdown;   //  倒计时，单位秒
         private String duration;    // 下雨持续时长，单位秒
         private String types;    // "2,1"  包含红包大类，1现金，2其他币种
@@ -102,14 +101,6 @@ public class RedRainActivityResponse implements Parcelable {
 
         public void setBeginTime(String beginTime) {
             this.beginTime = beginTime;
-        }
-
-        public String getForecast() {
-            return forecast;
-        }
-
-        public void setForecast(String forecast) {
-            this.forecast = forecast;
         }
 
         public String getCountdown() {
@@ -153,7 +144,6 @@ public class RedRainActivityResponse implements Parcelable {
                     ", subject='" + subject + '\'' +
                     ", serverTime='" + serverTime + '\'' +
                     ", beginTime='" + beginTime + '\'' +
-                    ", forecast='" + forecast + '\'' +
                     ", countdown='" + countdown + '\'' +
                     ", duration='" + duration + '\'' +
                     ", types='" + types + '\'' +
@@ -172,7 +162,6 @@ public class RedRainActivityResponse implements Parcelable {
             dest.writeString(this.subject);
             dest.writeString(this.serverTime);
             dest.writeString(this.beginTime);
-            dest.writeString(this.forecast);
             dest.writeString(this.countdown);
             dest.writeString(this.duration);
             dest.writeString(this.types);
@@ -187,7 +176,6 @@ public class RedRainActivityResponse implements Parcelable {
             this.subject = in.readString();
             this.serverTime = in.readString();
             this.beginTime = in.readString();
-            this.forecast = in.readString();
             this.countdown = in.readString();
             this.duration = in.readString();
             this.types = in.readString();
